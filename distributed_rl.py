@@ -105,4 +105,17 @@ class Agent:
             fut.wait()
 
 
-        
+
+    def finish_episode():
+        R, probs , rewards = 0, [], []
+        for ob_id in self.rewards:
+            probs.extend(self.saved_log_probs[ob_id])
+            rewards.extend(self.rewards[ob_id])
+
+
+        min_reward = min([sum(self.rewards) for ob_id in self.rewards])
+        self.running_reward = 0.05 * min_reward + ( 1 - 0.05 ) * self.running_reward
+
+        # clear saved probs and rewards
+        for ob_id in self.rewards:
+            self.rewards[ob_id] = []
