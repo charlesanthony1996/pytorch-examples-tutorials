@@ -68,4 +68,41 @@ class Agent:
     def __init__(self, world_size):
         self.ob_rrefs = []
         self.agent_rref = RRef(self)
+        self.rewards = {}
+        self.saved_log_probs = []
+        self.policy = Policy()
+        self.optimizer = optim.Adam(self.policy.parameters(), lr = 1e-2)
+        self.eps = np.finfo(np.float32).eps.item()
+        self.running_reward = 0
+        self.reward_threshold = gym.make("CartPole-v1").spec_reward_threshold
+        for ob_rank in range(1, word_size):
+            ob_info = rpc.get_worker_info(OBSERVER_NAME.format(ob_rank))
+            self.ob_rrefs.append(remote(ob_info, Observer))
+            self.rewards[ob_info.id] = []
+            self.saved_log_probs[ob_info.id] = []
+
+
+    def select_action(self, ob_id, state):
+        state = torch.from_numpy(state).float().unsqueeze(0)
+        probs = self.policy(state)
+        m = Categorical(probs)
+        action = m.sample()
+        self.saved_log_probs[ob_id].append(m.log_probs(action))
+        return action.item()
+
+
+
+    def report_reward(self, ob_id, reward):
+        self.rewards[ob_id].append(reward)
+
+
+    def run_episode(self):
+        futs = []
+        for ob_rref in self.ob_rrefs:
+            futs.append(rpc_async, ob_rref.owner(), ob_rref.rpc_sync().run_episode, args=(self.agent_rref,))
+
+        for fut in futs:
+            fut.wait()
+
+
         
