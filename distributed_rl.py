@@ -33,7 +33,7 @@ parser.add_argument("--log_interval", type = int, default = 10, metavar ="N", he
 
 parser.add_argument("--gamma", type=float, default= 0.9, metavar="G", help="how much to value future networks")
 
-arg = parser.parse_args()
+args = parser.parse_args()
 
 class Observer:
     def __init__(self):
@@ -119,3 +119,80 @@ class Agent:
         # clear saved probs and rewards
         for ob_id in self.rewards:
             self.rewards[ob_id] = []
+
+
+        policy_loss , returns = [], []
+        for r in rewards[::-1]:
+            R = r + args.gamma * R
+            returns.insert(0, R)
+
+        returns = torch.tensor(returns)
+        returns = (returns - returns.mean() / returns.std() + self.eps())
+
+        for log_prob , R in zip(probs, returns):
+            policy_loss.append(-log_prob * R)
+        
+        self.optimizer = torch.cat(policy_loss).sum()
+        policy_loss.backward()
+        self.optimizer.step()
+        return min_reward()
+
+
+
+import os
+from itertools import count
+
+import torch.multiprocessing as mp
+
+
+#test imports
+import os
+import random
+import numpy as np
+from glob import glob
+from PIL import Image, ImageOps
+import matplotlib.pyplot as plt
+
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+AGENT_NAME = "agent"
+OBSERVER_NAME = "obs{}"
+
+def run_worker(rank, world_size):
+    os.environ["MASTER ADDR"] = "localhost"
+    os.environ["MASTER PORT"] = "29500"
+    if rank == 0:
+        #rank 0 is the agent
+        rpc.init_rpc(AGENT_NAME, rank = rank, world_size=world_size)
+
+        agent = Agent(world_size)
+
+        print(f"This will run until reward threshold of {agent.reward_threshold} is reached.Ctrl + C to exit")
+        
+        for i_episode in count(1):
+            agent.run_episode()
+            last_reward = agent.finish_episode()
+
+            if i_episode % args.log_interval == 0:
+                print(f"Episode {i_episode}\t last reward: {last_reward:.2f}\Average reward: {agent.running_reward:.2f}")
+            
+            if agent.running_reward > agent.reward_threshold:
+                print(f"Solved! running reward is now {agent.running_reward}")
+                break
+
+
+    else:
+        # other ranks are the observer
+        rpc.init_rpc(OBSERVER_NAME.format(rank), rank = rank, world_size= world_size)
+        # observers passively waiting for instructions from the agent
+
+    rpc.shutdown()
+
+
+
+mp.spawn(run_worker, args=(args.world_size, ), nprocs =args.world_size, join =True)
+
+
+
