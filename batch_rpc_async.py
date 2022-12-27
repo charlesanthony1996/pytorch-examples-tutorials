@@ -102,3 +102,30 @@ class Policy(nn.Module):
     def __init__(self, batch=True):
         super(Policy, self).__init__()
         self.affine1 = nn.Linear(4, 128)
+        self.dropout = nn.Dropout(p = 0.6)
+        self.affine2 = nn.Linear(128, 2)
+        self.dim = 2 if batch else 1
+
+
+    def forward(self, x):
+        x = self.affine1(x)
+        x = self.dropout(x)
+        x = F.relu(x)
+        action_scores = self.affine2(x)
+        return F.softmax(action_scores, dim = self.dim)
+
+
+import gymnasium as gym
+import torch.distributed.rpc as rpc
+
+class Observer:
+    def __init__(self, batch=True):
+        self.id = rpc.get_worker_info().id - 1
+        self.env = gym.make("CartPole-v1")
+        self.env.seed(args.seed)
+        self.select_action = Agent.select_action_batch if batch else Agent.select_action
+
+
+
+
+import torch
