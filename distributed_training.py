@@ -105,3 +105,64 @@ def partition_dataset():
 
 
     
+def run(rank, size):
+    torch.manual_seed(1234)
+    train_set, bsz = partition_dataset()
+    model = Net()
+    optimizer = optim.SGD(model.parameters(), lr=0.01, momentum = 0.5)
+
+    num_batches = ceil(len(train_dataset) / float(bsz))
+
+    for epoch in range(10):
+        epoch_loss = 0.0
+        optimizer.zero_grad()
+        output = model(data)
+        loss = F.nll_loss(output, target)
+        epoch_loss += loss.item()
+        loss.backward()
+        average_gradients(model)
+        optimizer.step()
+    print('Rank: ', dist.get_rank(), ", epoch ", epoch , ":", epoch_loss / num_batches)
+
+
+
+def average_gradients(model):
+    size = float(dist.get_world_size)
+    for param in model.parameters():
+        dist.all_reduce(param.get.data, op = dist.ReduceOp.SUM)
+        param.grad.data /= size
+
+
+
+
+#  our own ring alliance
+
+
+def allreduce(send, recv):
+    rank = dist.get_rank()
+    size = dist.get_world_size()
+    send_buff = send.clone()
+    recv_buff = send.clone()
+    accum = send.clone()
+
+
+    left = ((rank - 1) + size) % size
+    right = ((rank + 1) + size) % size
+
+    for i in range(size - 1):
+        if i % 2 == 0:
+            # send send_buff
+            send_req = dist.isend(send_buff, right)
+            dist.recv(recv_buff, left)
+            accum[:] += recv.buff[:]
+
+
+        else:
+            send_req = dist.isend(recv_buff, right)
+            dist.recv(send_buff, left)
+            accum[:] += send_buff[:]
+        send_req.wait()
+    recv[:] = accum[:]
+
+    
+     
