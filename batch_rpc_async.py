@@ -126,6 +126,5 @@ class Observer:
         self.select_action = Agent.select_action_batch if batch else Agent.select_action
 
 
-
-
-import torch
+    def run_episode(self, agent_rref, n_steps):
+        pass
