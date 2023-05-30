@@ -78,5 +78,34 @@ print(full_count)
 # x train
 print(x_train)
 
+# y train
+print(y_train)
+
+# reshape the data to the format expected by lstm layers
+x_train = x_train.reshape(-1, 1, 1)
+x_val = x_val.reshape(-1, 1, 1)
+
+# x train logging
+print(x_train)
+
+# x_val logging
+print(x_val)
+
+# fit the model to the data
+history = model.fit(x_train, y_train, epochs= 100, batch_size=32, validation_data=(x_val, y_val))
+
+# history logging
+print(history)
+
+
+# make a prediction for 2020 for austria 
+last_value = data[-1]
+last_value_normalized = (last_value - min_val) / (max_val - min_val)
+prediction_normalized = model.predict(np.array([[last_value_normalized]]))
+prediction = prediction_normalized * (max_val - min_val) + min_val
+print("predicted co2 emission for austria in 2020 in lstm: ", prediction)
+
+
+# make a prediction for 2020 for austria using the prophet model
 
 
