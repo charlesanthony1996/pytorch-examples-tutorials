@@ -107,5 +107,10 @@ print("predicted co2 emission for austria in 2020 in lstm: ", prediction)
 
 
 # make a prediction for 2020 for austria using the prophet model
-
-
+df_austria_prophet = df_austria[["Year", "CO2_emission"]]
+df_austria_prophet.columns = ["ds", "y"]
+m = Prophet()
+m.fit(df_austria_prophet)
+future = m.make_future_dataframe(periods=1, freq ="Y")
+forecast = m.predict(future)
+print("Predicted co2 emission for austria in 2020 with prophet: ", forecast.tail(1)["yhat"])
