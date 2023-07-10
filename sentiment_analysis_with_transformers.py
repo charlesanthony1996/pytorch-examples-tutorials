@@ -111,68 +111,162 @@ val_dataset = val_dataset.batch(batch_size).prefetch(buffer_size=tf.data.AUTOTUN
 
 # modelling
 
-# simpleRNN
-inputs = np.random.random([32, 10, 8]).astype(np.float32)
-simple_rnn = tf.keras.layers.SimpleRNN(25)
-output = simple_rnn(inputs)
-print(output.shape)
-
-embedding_dim = 64
-model = tf.keras.models.Sequential([
-    Input(shape=(sequence_length,)),
-    Embedding(vocab_size, embedding_dim),
-    SimpleRNN(32),
-    Dense(1, activation="relu")
-])
-
-model.summary()
+# transformers
+# embeddings
 
 
-checkpoint_filepath = "/users/charles/desktop/models/rnn.h5"
-
-model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-    filepath = checkpoint_filepath,
-    monitor = "val_accuracy",
-    mode = "max",
-    save_best_only=True
-)
-
-
-print(model_checkpoint_callback)
-
-model.compile(
-    loss=tf.keras.losses.BinaryCrossentropy(),
-    optimizer = tf.keras.optimizers.Adam(0.0001),
-    metrics=["accuracy"]
-)
+# positional embeddings
+def positional_encoding(model_size,sequence_length):
+    output = []
+    for pos in range(sequence_length):
+        PE = np.zeros((model_size))
+        for i in range(model_size):
+            if i % 2 == 0:
+                PE[i] = np.sin(pos/10000 **(i/model_size))
+            else:
+                PE[i] = np.cos(pos/ 10000 ** ((i - 1) /model_size))
+    output.append(tf.expand_dims(PE, axis= 0))
+    out = tf.concat(output, axis = 0)
+    out = tf.expand_dims(out , axis = 1)
+    return tf.cast(out, dtype=tf.float32)
 
 
-
-history = model.fit(
-    train_dataset,
-    validation_data=val_dataset,
-    epochs= 10,
-    callbacks = [model_checkpoint_callback]
-)
-
-
-# plotting loss against after each epoch
-plt.plot(history.history["loss"])
-plt.plot(history.history["val_loss"])
-plt.title("model_loss")
-plt.ylabel("loss")
-plt.xlabel("epoch")
-plt.legend(["train", "val"], loc="upper left")
-plt.show()
+class Embeddings(Layer):
+    def __init__(self, sequence_length, vocab_size, embed_dim,):
+        super(Embeddings, self).__init__()
+        self.token_embeddings= Embedding(
+            input_dim = vocab_size, output_dim = embed_dim
+        )
+        self.sequence_length = sequence_length
+        self.vocab_size = vocab_size
+        self.embed_dim = embed_dim
 
 
-# plotting accuracy against epoch
-plt.plot(history.history["accuracy"])
-plt.plot(history.history["val_accuracy"])
+    def call(self, inputs):
+        embedded_tokens = self.token_embeddings(inputs)
+        embedded_positions = positional_encoding(
+            self.embed_dim, self.sequence_length
+        )
+        return embedded_tokens + embedded_positions
 
-plt.title("model accuracy")
-plt.ylabel("accuracy")
-plt.xlabel("epoch")
-plt.legend(["train", "val"], loc="upper left")
-plt.show()
 
+    def compute_mask(self, inputs, mask=None):
+        return tf.math.not_equal(inputs, 0)
+
+
+    def get_config(self):
+        config = super().get_config()
+        config.update({
+            "sequence_length": self.sequence_length,
+            "vocab_size": self.vocab_size,
+            "emded_dim": self.embed_dim,
+        })
+
+        return config
+
+
+test_input = tf.constant([[2, 112, 10, 12, 5, 0, 0, 0,]])
+emb = Embeddings(8, 20000, 256)
+emb_out =emb(test_input)
+print(emb_out.shape)
+
+
+
+class TransformerEncoder(layer):
+    def __init__(self, embed_dim, dense_dim, num_heads,):
+        super(TransformerEncoder, self).__init__()
+        pass
+
+
+
+
+    
+
+
+
+
+# # simpleRNN
+# inputs = np.random.random([32, 10, 8]).astype(np.float32)
+# simple_rnn = tf.keras.layers.SimpleRNN(25)
+# output = simple_rnn(inputs)
+# print(output.shape)
+
+# embedding_dim = 64
+# model = tf.keras.models.Sequential([
+#     Input(shape=(sequence_length,)),
+#     Embedding(vocab_size, embedding_dim),
+#     SimpleRNN(32),
+#     Dense(1, activation="relu")
+# ])
+
+# model.summary()
+
+
+# checkpoint_filepath = "/users/charles/desktop/models/rnn.h5"
+
+# model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+#     filepath = checkpoint_filepath,
+#     monitor = "val_accuracy",
+#     mode = "max",
+#     save_best_only=True
+# )
+
+
+# print(model_checkpoint_callback)
+
+# model.compile(
+#     loss=tf.keras.losses.BinaryCrossentropy(),
+#     optimizer = tf.keras.optimizers.Adam(0.0001),
+#     metrics=["accuracy"]
+# )
+
+
+
+# history = model.fit(
+#     train_dataset,
+#     validation_data=val_dataset,
+#     epochs= 10,
+#     callbacks = [model_checkpoint_callback]
+# )
+
+
+# # plotting loss against after each epoch
+# plt.plot(history.history["loss"])
+# plt.plot(history.history["val_loss"])
+# plt.title("model_loss")
+# plt.ylabel("loss")
+# plt.xlabel("epoch")
+# plt.legend(["train", "val"], loc="upper left")
+# plt.show()
+
+
+# # plotting accuracy against epoch
+# plt.plot(history.history["accuracy"])
+# plt.plot(history.history["val_accuracy"])
+
+# plt.title("model accuracy")
+# plt.ylabel("accuracy")
+# plt.xlabel("epoch")
+# plt.legend(["train", "val"], loc="upper left")
+# plt.show()
+
+
+# # evaluation
+
+# transformer.load_weights(checkpoint_filepath)
+
+# test_dataset = test_ds.map(vectorizer)
+# test_dataset = test_dataset.batch(batch_size)
+# transformer.evaluate(test_dataset)
+
+
+# # testing
+
+# test_data= tf.data.Dataset.from_tensor_slices(["This was good"])
+
+# def vectorizer(review):
+#     return vectorize_layer(review)
+
+# test_dataset = test_data.map(vectorize_layer)
+
+# transformer.predict(test_dataset)
