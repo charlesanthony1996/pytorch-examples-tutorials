@@ -103,11 +103,114 @@ for i in range(3):
 
 # training
 optimizer = Adam(learning_rate=0.01)
+epochs = 20
+
+def custom_loss(y_true, y_pred, mean, log_var):
+    loss_rec = tf.reduce_mean(tf.reduce_sum(tf.keras.losses.binary_crossentropy(y_true, y_pred), axis=(1, 2)))
+
+    loss_reg = -0.5 * (1+ log_var - tf.square(mean) - tf.exp(log_var))
+
+    return loss_rec + tf.reduce_mean(tf.reduce_sum(loss_reg, axis= 1))
 
 
 
 
+@tf.function
+def training_block(x_batch):
+    with tf.GradientTape() as recorder:
+        z,mean, log_var = encoder_model(x_batch)
+        y_pred = decoder_model(z)
+        y_true = x_batch
+        loss = custom_loss(y_true, y_pred, mean, log_var)
 
 
+    partial_derivatives = recorder.gradient(loss, vae.trainable_weights)
+    optimizer.apply_gradients(zip(partial_derivatives, vae.trainable_weights))
+    return loss
+
+
+def neuralearn(epochs):
+    for epoch in range(1, epochs + 1):
+        print("training starts for epoch number {}".format(epoch))
+
+        for step, x_batch in enumerate(train_dataset):
+            loss = training_block(x_batch)
+        print("training loss is: ", loss)
+    print("Training complete!!!")
+
+
+
+# let this train
+# neuralearn(epochs)
+
+
+# overriding train_step method
+
+class VAE(tf.keras.Model):
+    def __init__(self, encoder_model, decoder_model):
+        super(VAE, self).__init__()
+        self.encoder = encoder_model
+        self.decoder = decoder_model
+        self.loss_tracker = tf.keras.metrics.Mean(name="loss")
+
+    @property
+    def metrics(self):
+        return [self.loss_tracker]
+
+
+    def train_step(self, x_batch):
+        with tf.GradientTape() as recorder:
+            z, mean, log_var = encoder_model(x_batch)
+            y_pred = decoder_model(z)
+            y_true = x_batch
+            loss = custom_loss(y_true, y_pred, mean, log_var)
+
+
+        partial_derivatives = recorder.gradient(loss, self.trainable_weights)
+        optimizer.apply_gradients(zip(partial_derivatives, self.trainable_weights))
+
+        self.loss_tracker.update_state(loss)
+        return {"loss": self.loss_tracker.result() }
+
+
+
+model = VAE(encoder_model, decoder_model)
+model.compile(optimizer= optimizer)
+model.fit(train_dataset, epochs = 20, batch_size=128,)
+
+
+# testing
+scale = 1
+n = 16
+
+grid_x = np.linspace(-scale, scale, 16)
+grid_y = np.linspace(-scale, scale, 16)
+
+print(grid_x, grid_y)
+
+plt.figure(figsize=(12, 12))
+k = 0
+for i in grid_x:
+    for j in grid_y:
+        x = plt.subplot(n, n, k + 1)
+
+        input = tf.constant([[i, j]])
+        out = model.decoder.predict(input)[0][..., 0]
+        plt.imshow(out, cmap="Greys_r")
+        plt.axis("off")
+        k += 1
+
+
+
+print(vae.layers[2].predict(tf.constant([[-1,1]]))[0][..., 0].shape)
+
+(x_train, y_train), _ = tf.keras.datasets.mnist.load_data()
+mnist_digits = np.expand_dims(x_train, -1).astype("float32") / 255
+
+z, _, _ =  vae.layers[1].predict(x_train)
+plt.figure(figsize=(12, 12))
+plt.scatter(z[:,0] , z[:, 1], c= y_train)
+plt.colorbar()
+plt.show()
 
 
