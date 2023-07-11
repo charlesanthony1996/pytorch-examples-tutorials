@@ -175,98 +175,31 @@ print(emb_out.shape)
 class TransformerEncoder(layer):
     def __init__(self, embed_dim, dense_dim, num_heads,):
         super(TransformerEncoder, self).__init__()
-        pass
-
-
-
+        self.embed_dim = embed_dim
+        self.dense_dim = dense_dim
+        self.num_heads = num_heads
+        self.attention = MultiHeadAttention(
+            num_heads = num_heads, key_dim = embed_dim,
+        )
+        self.dense_proj = tf.keras.Sequential(
+            [Dense(dense_dim, activation="relu"), Dense(embed_dim,)]
+        )
+        self.layernorm_1 = LayerNormalization()
+        self.layernorm_2 = LayerNormalization()
+        self.supports_masking = True
 
     
+    def call(self, inputs, mask = None):
+        if mask is not None:
+            mask1 = mask[:, : tf.newaxis]
+            mask2 = mask[:, tf.newaxis, :]
+            padding_mask = tf.cast(mask1&mask2 , dtype="int32")
 
 
+            attention_output = self.attention(
+                query= inputs, key=inputs, value=inputs, attention_mask=padding_mask
+            )
 
-
-# # simpleRNN
-# inputs = np.random.random([32, 10, 8]).astype(np.float32)
-# simple_rnn = tf.keras.layers.SimpleRNN(25)
-# output = simple_rnn(inputs)
-# print(output.shape)
-
-# embedding_dim = 64
-# model = tf.keras.models.Sequential([
-#     Input(shape=(sequence_length,)),
-#     Embedding(vocab_size, embedding_dim),
-#     SimpleRNN(32),
-#     Dense(1, activation="relu")
-# ])
-
-# model.summary()
-
-
-# checkpoint_filepath = "/users/charles/desktop/models/rnn.h5"
-
-# model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-#     filepath = checkpoint_filepath,
-#     monitor = "val_accuracy",
-#     mode = "max",
-#     save_best_only=True
-# )
-
-
-# print(model_checkpoint_callback)
-
-# model.compile(
-#     loss=tf.keras.losses.BinaryCrossentropy(),
-#     optimizer = tf.keras.optimizers.Adam(0.0001),
-#     metrics=["accuracy"]
-# )
-
-
-
-# history = model.fit(
-#     train_dataset,
-#     validation_data=val_dataset,
-#     epochs= 10,
-#     callbacks = [model_checkpoint_callback]
-# )
-
-
-# # plotting loss against after each epoch
-# plt.plot(history.history["loss"])
-# plt.plot(history.history["val_loss"])
-# plt.title("model_loss")
-# plt.ylabel("loss")
-# plt.xlabel("epoch")
-# plt.legend(["train", "val"], loc="upper left")
-# plt.show()
-
-
-# # plotting accuracy against epoch
-# plt.plot(history.history["accuracy"])
-# plt.plot(history.history["val_accuracy"])
-
-# plt.title("model accuracy")
-# plt.ylabel("accuracy")
-# plt.xlabel("epoch")
-# plt.legend(["train", "val"], loc="upper left")
-# plt.show()
-
-
-# # evaluation
-
-# transformer.load_weights(checkpoint_filepath)
-
-# test_dataset = test_ds.map(vectorizer)
-# test_dataset = test_dataset.batch(batch_size)
-# transformer.evaluate(test_dataset)
-
-
-# # testing
-
-# test_data= tf.data.Dataset.from_tensor_slices(["This was good"])
-
-# def vectorizer(review):
-#     return vectorize_layer(review)
-
-# test_dataset = test_data.map(vectorize_layer)
-
-# transformer.predict(test_dataset)
+            proj_input = self.layernorm_1(inputs + attention_mask)
+            proj_output = self.dense_proj(proj_input)
+            return self.layernorm_2(proj_input + proj)
