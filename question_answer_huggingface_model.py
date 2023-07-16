@@ -1,4 +1,5 @@
-import torch
+# torch is not needed
+# import torch
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -189,3 +190,57 @@ tokenized_dataset = dataset.map(
 
 
 print(tokenized_dataset)
+
+tf_dataset = tokenized_dataset["train"].to_tf_dataset(
+    shuffle=True,
+    batch_size=batch_size
+)
+
+for i in tf_dataset.take(10):
+    print(i)
+
+
+train_dataset = tf_dataset.take(int(0.9*len(tf_dataset)))
+
+val_dataset = tf_dataset.skip(int(0.9*len(tf_dataset)))
+
+# modelling
+
+from transformers import LongformerTokenizerFast, TFLongformerForQuestionAnswering
+
+model = TFLongformerForQuestionAnswering.from_pretrained("allenai/longformer-large-4096-finetuned-triviaqa")
+
+print(model)
+
+print(model.summary())
+
+
+optimizer = Adam(learning_rate = 0.00001)
+model.compile(optimizer=optimizer)
+
+history = model.fit(train_dataset, validation_data=val_dataset, epochs=1)
+
+
+# evaluation
+from evaluate import load
+
+squad_metric = load("squad")
+predictions =[{"prediction":"1999", "id": "56e10a3be3433e1400422b22"}]
+references = [{"answers": {"answer_start": [97], "text":["1976"]}, "id": "56e10a3be3433e1400422b22"}]
+results = squad_metric.compute(predictions= predictions , references=references)
+
+# testing
+
+question="how is the virus spread?"
+text="We know that the disease is caused by the SARS-CoV-2 virus"
+inputs = tokenizer(question, text, return_tensors= "tf")
+
+outputs = model(**inputs)
+
+answer_start = int(tf.math.argmax(outputs.start_logits, axis= -1)[0])
+answer_end_index = int(tf.math.argmax(outputs.end_logits, axis= 1)[0])
+
+predict_answer_tokens = inputs.input_ids[0, answer_start_index : answer_end_index + 1]
+print(predict_answer_tokens)
+tokenizer.decode(predict_answer_tokens)
+
