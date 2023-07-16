@@ -302,21 +302,21 @@ plt.show()
 transformer.load_weights(checkpoint_filepath)
 
 test_dataset = test_ds.map(vectorizer)
-test_dataset = test_datasets.batch(batch_size)
+test_dataset = test_dataset.batch(batch_size)
 transformer.evaluate(test_dataset)
 
 
 
 # testing
 
-test_data = td.data.Dataset.from_tensor_slices([["this movie looks interesting"], ["this movie is not that good"]])
+test_data = tf.data.Dataset.from_tensor_slices([["this movie looks interesting"], ["this movie is not that good"]])
 
-def vectorizer_test():
-    return vectorizer_layer(review)
+def vectorizer_test(review):
+    return vectorize_layer(review)
 
 test_dataset = test_data.map(vectorizer_test)
 
-transformer.predict(test_dataset)
+print(transformer.predict(test_dataset))
 
 
 # lsh attention
