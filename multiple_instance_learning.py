@@ -1,6 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from tensorflow import keras
+from tensorflow.keras import layers
 from tqdm import tqdm
 from matplotlib import pyplot as plt
 
@@ -74,6 +75,40 @@ val_data, val_labels = create_bags(
 # print(val_data)
 
 # print(val_labels)
+
+
+class MILAttentionLayer(layers.Layer):
+    def __init__(self,weight_params_dim,kernel_initializer="glorot_uniform",kernel_regularizer=None,use_gated=False,**kwargs):
+        super().__init__(**kwargs)
+        self.weight_params_dim = weight_params_dim
+        self.use_gated = use_gated
+
+        self.kernel_initializer = keras.initializers.get(kernel_initializer)
+        self.kernel_regularizer = keras.initializers.get(kernel_regularizer)
+
+        self.v_init = self.kernel_initializer
+        self.w_init = self.kernel_initializer
+        self.u_init = self.kernel_initializer
+
+        self.v_regularizer = self.kernel_regularizer
+        self.w_regularizer = self.kernel_regularizer
+        self.u_regularizer = self.kernel_regularizer
+
+    
+    def build(self, input_shape):
+        # input shape
+        # list of 2D tensors with shape: (batch_size, input_dim)
+        input_dim = input_shape[0][1]
+
+        self.v_weight_params = self.add_weight(
+            shape=(input_dim, self.weight_params_dim),
+            initializer = self.v_init,
+            name="v",
+            regularizer = self.v_regularizer,
+            trainable=True,
+        )
+
+        self.w_weight_params = 
 
 
 
