@@ -28,6 +28,30 @@ def add_book():
 
     return jsonify({"message":"Book added"}), 201
 
+@app.route("/delete_book", methods=["POST"])
+def delete_book():
+    data = request.json()
+    book_id = data.get("id")
+
+    conn = sqlite3.connect("books.db")
+    c = conn.cursor()
+
+    c.execute("DELETE FROM books WHERE id=?", (book_id, ))
+    rows_deleted = c.rowcount
+
+    conn.commit()
+    conn.close()
+
+    if rows_deleted == 0:
+        return jsonify({"message": "No book found with the given ID"}), 404
+    else:
+        return jsonify({"message": "Book deleted"}), 200
+
+
+
+
+
+
 
 
 # get all books
