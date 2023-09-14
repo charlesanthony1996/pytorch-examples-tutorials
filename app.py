@@ -5,6 +5,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+
 
 app = Flask(__name__)
 
@@ -46,12 +48,6 @@ def delete_book():
         return jsonify({"message": "No book found with the given ID"}), 404
     else:
         return jsonify({"message": "Book deleted"}), 200
-
-
-
-
-
-
 
 
 # get all books
