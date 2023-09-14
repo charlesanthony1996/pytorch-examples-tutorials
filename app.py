@@ -5,10 +5,71 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 
 
 app = Flask(__name__)
+app.secret_key = "secret"
+
+# initialize login manager
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+# user class for demostration purposes
+
+class User(UserMixin):
+    def __init__(self, id, username):
+        self.id = id
+        self.username = username
+    
+    def is_active(self):
+        return True
+
+    def is_authenticated(self):
+        return True
+
+    def is_anonymous(self):
+        return True
+
+    def get_id(self):
+        return str(self.id)
+
+    
+
+
+# example user data
+users = {1: User(1, "Charles"), 2: User(2, "Jane")}
+
+# add user_loader callback
+@login_manager.user_loader
+def load_user(user_id):
+    return users.get(int(user_id))
+
+# route to login (for demonstration, hard-coded)
+@app.route("/login", methods=["GET"])
+def login():
+    user = users.get(1)
+    login_user(user)
+    return "Logged in"
+
+
+# route to logout
+@app.route('/logout', methods=['GET'])
+@login_required
+def logout():
+    logout_user()
+    return "Logged out"
+
+
+# go to the users profile
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    if request.method == "POST":
+        new_name = request.form.get("username")
+        current_user.username = new_name
+    return f"Hello, {current_user.username}. <form method='post'> <input name='username'> </input> <input type='submit'></input> </form>"
+
 
 @app.route("/")
 def index():
