@@ -56,3 +56,81 @@ annual_energy_production = total_area * solar_irradiance * solar_panel_eff * per
 
 print(f"total suitable energy area: {total_area:.2f} m^2")
 print(f"estimated annual energy production: {annual_energy_production:.2f} kwh/year")
+
+
+# find out about how much energy upper austria needs per year
+
+
+# spatial density
+import seaborn as sns
+import geopandas as gpd
+import matplotlib.pyplot as plt
+
+
+# extract the coords
+gdf["x"] = gdf.geometry.centroid.x
+gdf["y"] = gdf.geometry.centroid.y
+
+# plotting
+fig, ax = plt.subplots(figsize=(6, 6))
+sns.kdeplot(x=gdf['x'], y = gdf["y"] , fill=True, cmap="viridis", ax=ax, cbar=True)
+
+ax.set_title("density of suitable areas for photovoltaic installations")
+ax.set_xlabel("longitude")
+ax.set_ylabel("latitude")
+
+# plt.show()
+
+# scatter plot for area and perimeter
+
+# extracting areas and parameters
+areas = gdf["Shape_STAr"]
+perimeter = gdf["Shape_STLe"]
+
+# creating the scatter plot
+plt.figure(figsize=(6, 6))
+plt.scatter(areas, perimeter, alpha= 0.6)
+plt.title("Area vs perimeterof suitable zones")
+plt.xlabel("Area (m^2)")
+plt.ylabel("Perimeter (m)")
+plt.grid(True)
+# plt.show()
+
+
+
+# how much does energy does upper austria consume per year?
+
+# assuming that annual_energy_production is the variable from your previous code
+# that holds the estimated energy production from the pv installation
+
+# replace this with the actual energy consumption data you found
+upper_austria_energy_consumption = 320 * 10**15
+
+annual_energy_production_joules = annual_energy_production * 3.6e6
+
+percentage_covered = (annual_energy_production_joules  / upper_austria_energy_consumption) * 100
+print(f"the potential pohotovoltaic installations could cover approximately {percentage_covered:.2f}% of upper austrias annual energy consumption")
+
+import torch
+import torch.nn as nn
+
+class TimeSeriesPredictor(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size = 1):
+        super(TimeSeriesPredictor, self).__init__()
+        self.rnn = nn.RNN(input_size , hidden_size)
+        self.linear = nn.Linear(hidden_size, output_size)
+
+    def forward(self, x):
+        x, _ = self.rnn(x)
+        x = self.linear(x[-1])
+        return x
+
+
+# example of data (replace with your time-series data)
+
+data = torch.randn(10, 5, 1)
+
+model = TimeSeriesPredictor(1, 50)
+output = model(data)
+
+# print(output)
