@@ -1,0 +1,11 @@
+Date,Order_ID,Product_Type,Material_Type,Thickness_mm,Length_mm,Width_mm,Number_of_Bends,Angles,Bend_Lengths,Quantity,Unit_Price,Total_Cost,Sides,Customer_Name,Customer_Address,Customer_City,Customer_ZIP
+2021-01-01,1,Panel,Aluminum,2.0,1000,500,0,,"",10,20,200,1,Maximilian Bauer,Herrengasse 10,Vienna,1010
+2021-01-05,2,Bracket,Steel,3.0,200,100,2,"90,45","100,50",25,10,250,3,Lena Huber,Schlossplatz 5,Salzburg,5020
+2021-01-10,3,Frame,Aluminum,4.0,2000,1000,3,"90,45,135","1000,500,250",5,100,500,4,Jonas Wagner,Mariahilfer Straße 50,Vienna,1070
+2021-01-15,4,Support,Steel,6.0,1000,200,1,90,"500",20,30,600,2,Emma Schmidt,Getreidegasse 20,Salzburg,5020
+2021-01-20,5,Panel,Copper,2.0,1000,500,0,,"",15,25,375,1,Lukas Schneider,Kärntner Straße 30,Vienna,1010
+2021-01-25,6,Bracket,Aluminum,1.5,150,75,2,"45,45","50,25",30,8,240,3,Sophie Meyer,Landstraßer Hauptstraße 50,Linz,4020
+2021-02-01,7,Frame,Steel,5.0,1800,900,3,"90,90,45","600,300,150",4,110,440,4,Tom Müller,Wiener Straße 20,Graz,8010
+2021-02-05,8,Support,Steel,7.0,900,180,1,135,"450",12,35,420,2,Laura Wolf,Steyrer Straße 40,Linz,4030
+2021-02-10,9,Panel,Copper,3.0,1200,600,0,,"",7,28,196,1,Marie Klein,Annagasse 10,Vienna,1010
+2021-02-15,10,Bracket,Aluminum,2.5,220,110,2,"30,60","110,55",20,12,240,3,Paul Fischer,Grazerplatz 15,Graz,8020

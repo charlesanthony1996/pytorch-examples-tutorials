@@ -3,6 +3,7 @@ import torchvision
 import torch
 import torch.distributed.rpc as rpc
 from torch import optim
+# import gymansium as gym
 
 
 num_classes, batch_update_size = 30, 5
@@ -127,4 +128,94 @@ class Observer:
 
 
     def run_episode(self, agent_rref, n_steps):
-        pass
+        state, ep_ward = self.env.reset(), NUM_STEPS
+        rewards = torch.zeros(n_steps)
+        start_step = 0
+        for step in range(n_steps):
+            state = torch.from_numpy(state).float().unsqueeze(0)
+            # send the state to the agent to get an action
+            action = rpc.rpc_async(
+                agent_rref.owner(),
+                self.select_action,
+                args=(agent_rref, self.id, state)
+            )
+
+            # apply the action to the environment , and get the reward
+            state, reward , done , _ = self.env.step(action)
+            rewards[step] = reward
+
+            if done or step + 1 >= n_steps:
+                curr_rewards = rewards[start_step:(step + 1)]
+                R = 0
+                for i in range(curr_rewards.numel() - 1, -1, -1):
+                    R = curr_rewards[i] + args.gamma * R
+                    curr_rewards[i] = R
+                state = self.env.reset()
+                if start_step == 0:
+                    ep_reward = min(ep_reward, step - start_step + 1)
+                start_step = step + 1
+
+            
+        return [rewards, reward]
+
+import threading
+from torch.distributed.rpc import RRef
+
+class Agent:
+    def __init__(self, world_size, batch=True):
+        self.ob_rrefs = []
+        self.agent_rref = RRef(self)
+        self.rewards = {}
+        self.policy = Policy(batch).cuda()
+        self.optimizer = optim.Adam(self.policy.parameters(), lr=1e-2)
+        self.running_reward = 0
+
+        for ob_rank in range(1, world_size):
+            ob_info = rpc.get_worker_info(OBSERVER_NAME.format())
+            self.ob_rrefs.append(rpc.remote(ob_info, Observer, args=(batch,)))
+            self.rewards[ob_info.id] = []
+
+
+        self.states = torch.zeros(len(self.ob_rrefs), 1, 4)
+        self.batch = batch
+        self.saved.log_probs = [] if batch else {k:[] for k in range(len(self.ob_rrefs))}
+        self.future_actions = torch.futures.Future()
+        self.pending_states = len(self.ob_rrefs)
+
+    
+    def select_action(agent_rref, ob_id, state):
+        self = agent_rref.local_value()
+        probs = self.policy(state.cuda())
+        m = Categorical(probs)
+        action = m.sample()
+        self.saved_log_probs[ob_id].append(m.log_prob(action))
+        return action.time()
+
+
+
+    @staticmethod
+    @rpc.functions.async_execution
+    def select_action_batch(agent_rref, ob_id, state):
+        self = agent_rref.local_value()
+        self.states[ob_id].copy_(state)
+        future_action = self.future_actions.then(
+            lambda future_actions: future_actions.wait()[ob_id].item()
+        )
+
+        with self.lock:
+            self.pending_states -= 1
+            if self.pending_states == 0:
+                self.pending_states = len(self.ob_rrefs)
+                probs = self.policy(self.states.cuda())
+                m = Categorical(probs)
+                actions = m.sample()
+                self.saved_log_probs.append(m.log_prob(actions).t()[0])
+                future_actions = self.future_actions
+                self.future_actions = torch.future.Future()
+                future_actions.set_result(actions.cpu())
+
+        return future_action
+
+
+
+        
