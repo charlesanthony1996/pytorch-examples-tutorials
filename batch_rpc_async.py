@@ -4,6 +4,8 @@ import torch
 import torch.distributed.rpc as rpc
 from torch import optim
 # import gymansium as gym
+import time
+import torch.multiprocessing as mp
 
 
 num_classes, batch_update_size = 30, 5
@@ -86,7 +88,7 @@ import argparse
 import os
 import torch
 import  torch.nn as nn
-import torch.nn.functional as f
+import torch.nn.functional as F
 
 parser = argparse.ArgumentParser(description ="Pytorch rpc batch rl example")
 parser.add_argument("--gamma", type=float, default=1.0, metavar= "G", help="discount factor (default 1.0)")
@@ -116,7 +118,7 @@ class Policy(nn.Module):
         return F.softmax(action_scores, dim = self.dim)
 
 
-import gymnasium as gym
+import gym
 import torch.distributed.rpc as rpc
 
 class Observer:
@@ -216,11 +218,76 @@ class Agent:
 
         return future_action
 
-    def run_episode():
-        pass
+    def run_episode(self, n_steps=0):
+        futs = []
+        for ob_rref in self.ob_rrefs:
+            # make async rpc to kick off an episode on all observers
+            futs.append(ob_rref.rpc_async().run_episode(self.agent_rref, n_steps))
+
+
+        # wait until all observers have finished this episode
+        rets = torch.futures.wait_all(futs)
+        rewards = torch.stack([ret[0] for ret in rets]).cuda().t()
+        ep_rewards = sum([ret[1] for ret in rets] / len(rets))
+
+        # stack saved probs into one tensor
+        if self.batch:
+            probs = torch.stack(self.saved_log_probs)
+        else:
+            probs = [torch.stack(selfs.saved_log_probs[i]) for i in range(len(rets))]
+            probs = torch.stack(probs)
+
+        policy_loss = -probs * rewards / len(rets)
+        policy_loss.sum().backward()
+        self.opitimizer.step()
+        self.optimizer.self_grad()
+
+        # reset variables
+        self.saved_log_probs = [] if self.batch else {k:[] for k in range(len(self.ob_rrefs))}
+        self.states = torch.zeros(len(self.ob_rrefs), 1, 4)
+
+        # calculate running rewards
+        self.running_reward = 0.5 * ep_rewards + 0.5 * self.running_reward
+        return ep_rewards , self.running_reward
+
+
+    def run_worker(rank, world_size, n_episode, batch, print_log=True):
+        os.environ["MASTER_ADDR"] = "localhost"
+        os.environ["MASTER_PORT"] = "29500"
+
+        if rank == 0:
+            # rank 0 is the highest
+            rpc.init_rpc(agent_name, rank = rank, world_size = world_size)
+
+            agent = Agent(world_size, batch)
+            for i_episode in range(n_episode):
+                last_reward, running_reward = agent.run(n_steps=num_steps)
+                
+                if print_log:
+                    print("Episode {}\last reward: {:.2f}\t Average reward: {:.2f}".format(i_episode, last_reward , running_reward))
+
+        else:
+            # other ranks are the observer
+            rpc.init_rpc(observer_name.format(rank), rank=rank, world_size = world_size)
+
+        rpc.shutdown()
 
 
 
+def main():
+    for world_size in range(2, 12):
+        delays = []
+        for batch in [True, False]:
+            tik = time.time()
+            mp.spawn(Agent.run_worker, args=(world_size, args.num_episode, batch), nprocs = world_size, join=True)
+            tok = time.time()
+            delays.append(tok - tik)
+            
+        print(f"{world_size}, {delays[0]}, {delays[1]}")
 
 
-        
+if __name__ == "__main__":
+    main()
+
+
+

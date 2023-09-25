@@ -9,8 +9,9 @@
 
     <body>
         <section class="container">
+            <!-- Total cost against date -->
         <div class="lineplot_chart" id="lineplot_chart"></div>
-        <!-- <div id="my_dataviz"></div> -->
+        <!-- thickness against quantity -->
         <div class="scatterplot_chart" id="scatterplot_chart"></div>
         <!-- <div class="heatmap_chart"  id="heatmap_chart"></div> -->
         </section>
@@ -18,7 +19,7 @@
 
     <script>
         // set the dimensions of the graph
-        var margin = { top: 10, right: 30, bottom: 30, left: 60}
+        var margin = { top: 50, right: 30, bottom: 30, left: 100}
         var width = 460 - margin.left - margin.right
         var height = 460 - margin.top - margin.bottom
 
@@ -50,8 +51,8 @@
         return {
             Date: d3.timeParse("%Y-%m-%d")(d.Date),
             Total_Cost: +d.Total_Cost,
-            Thickness_mm: +d.Thickness_mm,
-            Quantity: +d.Quantity
+            // Thickness_mm: +d.Thickness_mm,
+            // Quantity: +d.Quantity
             }
         },
 
@@ -117,11 +118,14 @@
                 Thickness: +d.Thickness_mm,
                 Quantity: +d.Quantity
             }
+        },
+
+        function(data) {
 
         // Add X axis
         var x = d3.scaleLinear()
         .domain([0, d3.max(data, function(d) {
-            return d.Thickness
+            return +d.Thickness
         })])
         .range([0, width])
         svgscatter.append("g")
@@ -133,21 +137,24 @@
         .domain([0, d3.max(data, function(d) {
                 return +d.Quantity
         })])
-        .range([ height, 0])
+        .range([height, 0])
         svgscatter.append("g")
         .call(d3.axisLeft(y))
 
         // Add dots
-        svgscatter.append('g')
+        svgscatter.append("g")
         .selectAll("dot")
         .data(data)
         .enter()
         .append("circle")
-        .attr("cx", function (d) { return x(d.Thickness); } )
-        .attr("cy", function (d) { return y(d.Quantity); } )
+        .attr("cx", function (d) { 
+            return x(d.Thickness)
+        })
+        .attr("cy", function (d) {
+            return y(d.Quantity)
+         })
         .attr("r", 1.5)
         .style("fill", "#69b3a2")
-
     })
 
     </script>
@@ -159,6 +166,10 @@
 
         .lineplot_chart {
             grid-area: lineplot;
+        }
+
+        .heatmapplot_chart {
+            grid-area: heatmapplot
         }
 
 
