@@ -13,7 +13,8 @@
         <div class="lineplot_chart" id="lineplot_chart"></div>
         <!-- thickness against quantity -->
         <div class="scatterplot_chart" id="scatterplot_chart"></div>
-        <!-- <div class="heatmap_chart"  id="heatmap_chart"></div> -->
+        <!-- material against product type -->
+        <div class="heatmapplot_chart"  id="heatmapplot_chart"></div>
         </section>
     </body>
 
@@ -24,6 +25,7 @@
         var height = 460 - margin.top - margin.bottom
 
         // append the svg object to the body of the image
+        // lineplot
         var svgline = d3.select("#lineplot_chart")
         .append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -86,6 +88,12 @@
             .y(function(d) {
                 return y(d.Total_Cost)
             })
+
+            // add x axis label
+            svgline.append("text")
+            .attr("text-anchor", "end")
+            .attr("x", width)
+            
 
             svgline.append("path")
             .datum(data)
@@ -155,6 +163,53 @@
          })
         .attr("r", 1.5)
         .style("fill", "#69b3a2")
+    })
+
+
+    // heatmap chart
+    var heatmap = d3.select("#heatmapplot_chart")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.right + ")")
+
+    // read the csv file
+    d3.csv("historical-material-data.csv",
+    function(d) {
+        return {
+            Thicknes: +d.Thickness_mm,
+            Quantity: +d.Quantity
+        }
+    },
+
+    function(data) {
+
+    // labels of row and columns
+    var myGroups = ["A", "B", "C", "D"]
+    var myVars = ["v1", "v2", "v3", "v4"]
+
+    // build x scales and axis
+    var x = d3.scaleBand()
+    .range([0, width])
+    .domain(myGroups)
+    .padding(0.01)
+    svg.append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x))
+
+    // build y scales and axis
+    var y = d3.scaleBand()
+    .range([height, 0])
+    .domain(myVars)
+    .padding(0.01)
+    svg.append("g")
+    .call(d3.axisLeft(y))
+
+    // build colour scale
+    var myColor = d3.scaleLinear()
+    .range(["white", "#69b3a2"])
+    .domain([1, 100])
     })
 
     </script>
