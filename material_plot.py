@@ -140,6 +140,27 @@
 # plt.show()
 
 
+import pandas as pd
+import plotly.express as px
+
+# load the data (adjust the path as needed)
+df = pd.read_csv("/users/charles/desktop/pytorch-examples-tutorials/historical-material-data.csv")
+
+# create scatter plot using plotly
+fig = px.scatter(df,x="Thickness_mm", y="Quantity", color="Material_Type", title="Thickness vs Quantity",
+ labels={"Thickness_mm": "Thickness (mm)", 'Quantity': 'Quantity ordered'}, hover_data=["Material_Type"])
 
 
+# add reference lines if needed (average thickness and average quantity)
+avg_thickness = df["Thickness_mm"].mean()
+avg_quantity = df["Quantity"].mean()
 
+fig.add_shape(type="line", x0=avg_thickness, x1=avg_thickness, y0=0, y1=df["Quantity"].max(),
+line=dict(color="Red", width=2, dash="dash"))
+
+fig.add_shape(type="line", x0=0, x1=df["Thickness_mm"].max(), y0=avg_quantity, y1=avg_quantity,
+line=dict(color="Blue", width=2, dash="dash"))
+
+fig.update_layout(hovermode="closest", template="plotly_dark")
+
+# fig.show()
