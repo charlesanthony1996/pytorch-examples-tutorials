@@ -172,45 +172,85 @@
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.right + ")")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+    var x = d3.scaleBand().range([0, width]).padding(0.01)
+    var y = d3.scaleBand().range([height, 0]).padding(0.01)
+    var myColor = d3.scaleLinear().range(["white", "#69b3a2"]).domain([1, 100])
 
     // read the csv file
     d3.csv("historical-material-data.csv",
     function(d) {
         return {
-            Thicknes: +d.Thickness_mm,
+            Thickness: +d.Thickness_mm,
             Quantity: +d.Quantity
         }
     },
 
     function(data) {
+    
+    // x and y domains
+    x.domain(data.map(d => d.Thickness))
+    y.domain(data.map(d => d.Quantity))
 
     // labels of row and columns
-    var myGroups = ["A", "B", "C", "D"]
-    var myVars = ["v1", "v2", "v3", "v4"]
+    // var myGroups = ["A", "B", "C", "D"]
+    // var myVars = ["v1", "v2", "v3", "v4"]
+
+    x.domain(data.map(d => d.Thickness))
+    y.domain(data.map(d => d.Quantity))
 
     // build x scales and axis
-    var x = d3.scaleBand()
-    .range([0, width])
-    .domain(myGroups)
-    .padding(0.01)
-    svg.append("g")
+    // var x = d3.scaleBand()
+    // .range([0, width])
+    // .domain(myGroups)
+    // .padding(0.01)
+    // heatmap.append("g")
+    // .attr("transform", "translate(0," + height + ")")
+    // .call(d3.axisBottom(x))
+
+    // console.log(x)
+
+    // build y scales and axis
+    // var y = d3.scaleBand()
+    // .range([height, 0])
+    // .domain(myVars)
+    // .padding(0.01)
+    // heatmap.append("g")
+    // .call(d3.axisLeft(y))
+
+    // console.log(y)
+
+    // build colour scale
+    // var myColor = d3.scaleLinear()
+    // .range(["white", "#69b3a2"])
+    // .domain([1, 100])
+    // })
+
+    heatmap.append("g")
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(x))
 
-    // build y scales and axis
-    var y = d3.scaleBand()
-    .range([height, 0])
-    .domain(myVars)
-    .padding(0.01)
-    svg.append("g")
-    .call(d3.axisLeft(y))
+    heatmap.append("g").call(d3.axisLeft(y))
 
-    // build colour scale
-    var myColor = d3.scaleLinear()
-    .range(["white", "#69b3a2"])
-    .domain([1, 100])
+    // heatmap.selectAll()
+    // .data(data, function(d) {
+    //     return d.myGroups + ':' + d.myVars
+    // })
+    // .enter()
+    // .append("rect")
+    // .attr("x", function(d) {
+    //     return x(d.myGroups)
+    // })
+    // .attr("y", function(d) {
+    //     return y(d.myVars)
+    // })
+    // .attr("width", x.bandwidth())
+    // .attr("height", y.bandwidth())
+    // .style("fill", function(d) {
+    //     return myColor(d.value)
     })
+
 
     </script>
 
