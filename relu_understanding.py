@@ -30,3 +30,12 @@ def residual_block(input_data, filter1, filter2):
 
 def global_avg_pooling(data):
     return sum(data)/ len(data)
+
+
+# simplified resnet - 50 structure
+input_data = [1.0, 2.0, 3.0, 4.0]
+
+# intial convolution
+conv1_filter = [0.5, 0.5, 0.5, 0.5]
+x = convolution()
+
