@@ -55,3 +55,23 @@ print("coefficient: ", logit_model.coef_)
 average_accident_rate = df['Accident_yes_no'].mean() * 100
 print(f"The average accident rate: {average_accident_rate:.2f}%")
 
+
+def predict_accident_risk(model, worker_data):
+    # assuming worker is a data frame containing a single row of predictor values for a worker
+    predicted_probability = model.predict_proba(worker_data)[:,1]
+    return predicted_probability[0] * 100
+
+
+worker_data = pd.DataFrame({
+    'Experience_years': [5],
+    'Hours_Worked_per_week': [40],
+    'Training_hours': [10],
+    'Machine_Age_years': [2],
+    'Maintenance_per_year': [4],
+    'Worker_weight_kg': [82],
+    'Worker_height_cm': [170]
+})
+
+risk = predict_accident_risk(logit_model, worker_data)
+
+print(f"Predicted accident risk for the worker: {risk:.2f}%")
