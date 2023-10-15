@@ -32,14 +32,14 @@
         d3.csv("historical-material-data.csv").then(function(data) {
             data = data.map(function(d) {
                 return {
-                    Thickness: +d.Thickness_mm,
-                    Quantity: +d.Quantity
+                    Product_Type: +d.Product_Type,
+                    Material_Type: +d.Material_Type
                 };
             });
 
         
-        x.domain(data.map(d => d.Thickness))
-        y.domain(data.map(d => d.Quantity))
+        x.domain(data.map(d => d.Product_Type))
+        y.domain(data.map(d => d.Material_Type))
 
         heatmap.append("g")
             .attr("transform", "translate(0," + height + ")")
@@ -51,8 +51,8 @@
         .data(data)
         .enter()
         .append("rect")
-        .attr("x", d => x(d.Thickness))
-        .attr("y", d => y(d.Quantity))
+        .attr("x", d => x(d.Product_Type))
+        .attr("y", d => y(d.Material_Type))
         .attr("width", x.bandwidth())
         .attr("height", y.bandwidth())
         .style("fill", d => myColor(d.Quantity))
