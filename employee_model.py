@@ -75,3 +75,20 @@ worker_data = pd.DataFrame({
 risk = predict_accident_risk(logit_model, worker_data)
 
 print(f"Predicted accident risk for the worker: {risk:.2f}%")
+
+# someone else's prediction
+# most important point here is that the training hours
+# have a strong impact on the outcome
+worker_data1 = pd.DataFrame({
+    'Experience_years': [10],
+    'Hours_Worked_per_week': [38.5],
+    'Training_hours': [10],
+    'Machine_Age_years': [1],
+    'Maintenance_per_year': [0],
+    'Worker_weight_kg': [51],
+    'Worker_height_cm': [166]
+})
+
+risk2 = predict_accident_risk(logit_model, worker_data1)
+
+print(f"Charles's accident risk: {risk2:.2f}%")

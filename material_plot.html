@@ -10,20 +10,27 @@
 
     <body>
         <section class="container">
-            <!-- Total cost against date -->
+        <!-- first row -->
         <div class="lineplot_chart" id="lineplot_chart"></div>
         <!-- thickness against quantity -->
         <div class="scatterplot_chart" id="scatterplot_chart"></div>
         <!-- material against product type -->
         <div class="heatmapplot_chart"  id="heatmapplot_chart"></div>
-        </section>
+
+        <!-- second row -->
+        <div class="histogramplot_chart" id="histogramplot_chart"></div>
+
+        <!-- <div class="dummyplot_chart" id="dummyplot_chart"></div> -->
+
+
+        </section>        
     </body>
 
     <script>
         // set the dimensions of the graph
-        var margin = { top: 50, right: 30, bottom: 30, left: 100}
-        var width = 460 - margin.left - margin.right
-        var height = 460 - margin.top - margin.bottom
+        var margin = { top: 50, right: 30, bottom: 30, left: 70}
+        var width = 360 - margin.left - margin.right
+        var height = 360 - margin.top - margin.bottom
 
         // append the svg object to the body of the image
         // lineplot
@@ -177,7 +184,7 @@
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
-    console.log(heatmap)
+    // console.log(heatmap)
 
     d3.csv("historical-material-data.csv", function(data) {
         var myGroups = d3.map(data, function(d) {
@@ -222,7 +229,7 @@
         // .domain([1, 100])
 
         var myColor = d3.scaleLinear()
-        .range(["green", "red"])
+        .range(["red", "green"])
         .domain([1,100])
 
         // add the squares
@@ -250,6 +257,103 @@
         .style("opacity", 0.8)
     })
 
+
+    // =================
+
+
+    // histogram plot
+    // angles
+    var histogram = d3.select("#histogramplot_chart")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+    // console.log(histogram._parents[0].clientHeight)
+
+    // getting the data
+    d3.csv("historical-material-data.csv", function(data) {
+        // console.log(data)
+
+        // convert angles string into an array of numbers
+        data.forEach(function(d) {
+            d.Angles = d.Angles ? d.Angles.split(',').map(Number): []
+            console.log(d.Angles)
+        })
+
+        // flatten the angles data for the histogram
+        var flatAngles = data.reduce(function(acc, row) {
+            return acc.concat(row.Angles)
+        }, [])
+
+        console.log(flatAngles)
+
+        // x axis: scale and draw
+        var x = d3.scaleLinear()
+        .domain([0, 1000])
+        .range([0, width])
+        histogram.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x))
+
+
+        // console.log(x)
+
+        // set the parameters for the histogram
+        var histogram_parameters = d3.histogram()
+        .value(function(d) {
+            return d
+        })
+        .domain(x.domain())
+        .thresholds(x.ticks(70))
+
+        console.log(histogram_parameters)
+
+        // apply this function to data to get the bins
+        var bins = histogram_parameters(flatAngles)
+
+        // console.log(bins)
+
+        // y axis: scale and draw
+        var y = d3.scaleLinear()
+        .range([height, 0])
+        y.domain([0, d3.max(bins, function(d) {
+            return d.Angles
+        })])
+        histogram.append("g")
+        .call(d3.axisLeft(y))
+
+        // console.log(y)
+
+        // append the bar rectangles to the svg element
+        histogram.selectAll("rect")
+        .data(bins)
+        .enter()
+        .append("rect")
+        .attr("x", 1)
+        .attr("transform", function(d) {
+            return "translate(" + x(d.x0) + "," + y(d.Angles) + ")"
+        })
+        .attr("width", function(d) {
+            return x(d.x1) - x(d.x0) - 1
+        })
+        .attr("height", function(d) {
+            return height - y(d.Angles)
+        })
+        .style("fill", "#69b3a2")
+
+
+
+    })
+
+    // generic tooltip feature
+    
+
+
+
+
+
     </script>
 
     <style>
@@ -272,11 +376,14 @@
 
         .container {
             display: grid;
-            grid-template-areas: 'lineplot scatterplot heatmapplot';
+            grid-template-areas:
+                "scatterplot lineplot heatmapplot"
+                "histogramplot none none";
+
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr;
-            column-gap: 100px;
-            row-gap: 100px;
+            column-gap: 70px;
+            row-gap: 70px;
             grid-auto-flow: auto;
 
         }
