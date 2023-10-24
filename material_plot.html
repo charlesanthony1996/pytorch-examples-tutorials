@@ -20,6 +20,8 @@
         <!-- second row -->
         <div class="histogramplot_chart" id="histogramplot_chart"></div>
 
+        <div class="scatterplot2_chart" id="scatterplot2_chart"></div>
+
         <!-- <div class="dummyplot_chart" id="dummyplot_chart"></div> -->
 
 
@@ -319,7 +321,7 @@
         var y = d3.scaleLinear()
         .range([height, 0])
         y.domain([0, d3.max(bins, function(d) {
-            return d.Angles
+            return d.length
         })])
         histogram.append("g")
         .call(d3.axisLeft(y))
@@ -333,13 +335,13 @@
         .append("rect")
         .attr("x", 1)
         .attr("transform", function(d) {
-            return "translate(" + x(d.x0) + "," + y(d.Angles) + ")"
+            return "translate(" + x(d.x0) + "," + y(d.length) + ")"
         })
         .attr("width", function(d) {
             return x(d.x1) - x(d.x0) - 1
         })
         .attr("height", function(d) {
-            return height - y(d.Angles)
+            return height - y(d.length)
         })
         .style("fill", "#69b3a2")
 
@@ -347,8 +349,14 @@
 
     })
 
-    // generic tooltip feature
+    // scatterplot 2
+    // thickness of the material against the quantity ordered
+    var scatterplot2 = d3.select("#scatterplot2_chart")
     
+
+
+    console.log(scatterplot2)
+
 
 
 
@@ -371,6 +379,10 @@
 
         .histogramplot_chart {
             grid-area: histogramplot
+        }
+
+        .scatterplot2_chart {
+            grid-area: scatterplot2
         }
 
 

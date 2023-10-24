@@ -1,0 +1,8 @@
+Date,Order_ID,Product_Type,Material_Type,Thickness_mm,Tolerance_Thickness_mm,Length_mm,Width_mm,Grain_Direction,Number_of_Bends,Angles,Bend_Lengths,Bend_Allowance_mm,Bend_Sequence,Punch_Type,Die_Type,Relief_Cuts_Location,Relief_Cuts_Size_mm,Quantity,Unit_Price,Total_Cost,Yield_Strength_MPa,Bend_Angle_Tolerance,Bend_Radius_Tolerance,Flat_Dimensions_Tolerance,Secondary_Operations,Finishing_Details,Rejection_Rate,Reasons_for_Rejection
+2021-01-05,2,Bracket,Steel,3,0.07,200,100,Transverse,2,"90,45","100,50",1,1-2,Punch_B,Die_B,"50,100","2,3",25,10,250,400,1°,0.5mm,1mm,Drilling,Galvanized,0.5%,Angle Error
+2021-01-10,3,Frame,Aluminum,4,0.08,2000,1000,Transverse,3,"90,45,135","1000,500,250",2,1-2-3,Punch_C,Die_C,"250,500","3,4",5,100,500,290,1.5°,0.8mm,1.2mm,Welding,Anodized,0.2%,Length Error
+2021-01-15,4,Support,Steel,6,0.1,1000,200,Longitudinal,1,90,500,3,None,Punch_D,Die_D,450,5,20,30,600,410,2°,1mm,2mm,Drilling,Painted,1%,Width Error
+2021-01-25,6,Bracket,Aluminum,1.5,0.04,150,75,Transverse,2,"45,45","50,25",0.5,1-2,Punch_F,Die_F,"30,60","1,1.5",30,8,240,260,1°,0.3mm,0.5mm,Drilling,Painted,0.3%,Angle Error
+2021-02-01,7,Frame,Steel,5,0.1,1800,900,Transverse,3,"90,90,45","600,300,150",2.5,2-3-1,Punch_G,Die_G,"550,290","4,3.5",4,110,440,420,2°,1.2mm,2.2mm,Welding,Galvanized,0.4%,Radius Error
+2021-02-05,8,Support,Steel,7,0.15,900,180,Longitudinal,1,135,450,4,None,Punch_H,Die_H,420,6,12,35,420,430,2.5°,1.5mm,3mm,Welding,Painted,1.2%,Length Error
+2021-02-15,10,Bracket,Aluminum,2.5,0.06,220,110,Longitudinal,2,"30,60","110,55",1,2-1,Punch_J,Die_J,"105,52","2.5,3",20,12,240,275,1.3°,0.6mm,1.1mm,Drilling,Anodized,0.6%,Angle Error
