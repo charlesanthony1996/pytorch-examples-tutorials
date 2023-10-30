@@ -20,7 +20,7 @@
         <!-- second row -->
         <div class="histogramplot_chart" id="histogramplot_chart"></div>
 
-        <div class="scatterplot2_chart" id="scatterplot2_chart"></div>
+        <div class="bubbleplot_chart" id="bubbleplot_chart"></div>
 
         <!-- <div class="dummyplot_chart" id="dummyplot_chart"></div> -->
 
@@ -349,13 +349,80 @@
 
     })
 
-    // scatterplot 2
-    // thickness of the material against the quantity ordered
-    var scatterplot2 = d3.select("#scatterplot2_chart")
+    // bubble plot chart
+    var bubble = d3.select("#bubbleplot_chart")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+    console.log(bubble)
+
+    // 3 axes to understand the complexity of the order
+    d3.csv("historical-material-data.csv", function(d) {
+        return {
+            Thickness: +d.Thickness_mm,
+            Quantity: +d.Quantity,
+            Number_of_Bends: +d.Number_of_Bends
+        }
+    },
+
+    function(data) {
+        // add x axis
+        var x = d3.scaleLinear()
+        .domain([0, d3.max(data, function(d) {
+            return +d.Thickness
+        })])
+        .range([0, width])
+        bubble.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x))
+
+        // add y axis
+        var y = d3.scaleLinear()
+        .domain([0, d3.max(data, function(d) {
+            return +d.Quantity
+        })])
+        .range([height, 0])
+        bubble.append("g")
+        .call(d3.axisLeft(y))
+
+        // add a scale for bubble size
+        var z = d3.scaleLinear()
+        .domain([0, d3.max(data, function(d) {
+            return +d.Number_of_Bends
+        })])
+        .range([1, 10])
+
+        
+
+        bubble.append("g")
+        .selectAll("dot")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("cx", function(d) {
+            return x(d.Thickness)
+        })
+        .attr("cy", function(d) {
+            return y(d.Quantity)
+        })
+        .attr("r", function(d) {
+            return z(d.Number_of_Bends)
+        })
+        .style("fill", "#69b3a2")
+        .style("opacity", "0.7")
+        .attr("stroke", "black")
+    }
     
+    
+    
+    )
 
 
-    console.log(scatterplot2)
+
+
 
 
 
@@ -381,8 +448,8 @@
             grid-area: histogramplot
         }
 
-        .scatterplot2_chart {
-            grid-area: scatterplot2
+        .bubbleplot_chart {
+            grid-area: bubbleplot
         }
 
 
@@ -390,7 +457,7 @@
             display: grid;
             grid-template-areas:
                 "scatterplot lineplot heatmapplot"
-                "histogramplot none none";
+                "histogramplot bubbleplot none";
 
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr;
