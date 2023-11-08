@@ -83,4 +83,13 @@ def encode_single_sample(img_path, label):
     img = tf.io.decode_png(img, channels=1)
     # convert to float32 in [0, 1] range
     img = tf.image.convert_image_dtype(img, tf.float32)
-    # resize 
+    # resize to the desired size
+    img = tf.image.resize(img, [img_height, img_width])
+    # 5 transpose the image because we want the time
+    # dimension to correspond to the width of the image
+    img = tf.transpose(img, perm=[1, 0, 2])
+    # 6 map the charachters in label to numbers
+    label = char_to_num(tf.strings.unicode_split(label, input_encoding="UTF-8"))
+
+
+    return {"image": img, "label": label}
