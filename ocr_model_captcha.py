@@ -106,6 +106,14 @@ train_dataset = (
     .prefetch(buffer_size = tf.data.AUTOTUNE)
 )
 
+validation_dataset = tf.data.Dataset.from_tensor_slices((x_valid, y_valid))
+validation_dataset = (
+    validation_dataset.map(encode_single_sample, num_parallel_calls=tf.data.AUTOTUNE)
+    .batch(batch_size)
+    .prefetch(buffer_size=tf.data.AUTOTUNE)
+
+)
+
 # visualize the data
 _, ax = plt.subplots(4, 4, figsize=(10, 5))
 for batch in train_dataset.take(1):
@@ -123,7 +131,7 @@ for batch in train_dataset.take(1):
 
 
 class CTCLayer(layers.Layer):
-    def __init__():
+    def __init__(self, name=None):
         super().__init__(name=name)
         self.loss_fn = keras.backend.ctc_batch_cost
 
@@ -144,4 +152,76 @@ class CTCLayer(layers.Layer):
         # at test time , just return the computed predictions
         return y_pred
 
-        
+
+
+def build_model():
+    # inputs to the model
+    input_img = layers.Input(
+            shape = (img_width, img_height, 1), name='image', dtype='float32'
+        )
+
+    labels = layers.Input(name='label', shape=(None, ), dtype='float32')
+
+    # first conv block
+    x = layers.Conv2D(32, (3, 3), activation="relu", kernel_initializer="he_normal", padding="same", name="Conv1" )(input_img)
+    x = layers.MaxPooling2D((2, 2), name="pool1")(x)
+
+    # second conv block
+    x = layers.Conv2D(64, (3,3), activation="relu", kernel_initializer="he_normal", padding="same", name="Conv2")(x)
+    x = layers.MaxPooling2D((2, 2), name="pool2")(x)
+
+    # we have used two max pool with pool size and strides 2
+    # hence, downsampled feature maps are 4x smaller . the number of
+    # filters in the last layer is 64. reshape accordingly before
+    # passing the output to the RNN part of the model
+
+    new_shape = ((img_width // 4), (img_height // 4) * 64)
+    x = layers.Reshape(target_shape = new_shape, name="reshape")(x)
+    x = layers.Dense(64, activation="relu", name="dense1")(x)
+    x = layers.Dropout(0.2)(x)
+
+    # rnns
+    x = layers.Bidirectional(layers.LSTM(128, return_sequences=True, dropout=0.25))(x)
+    x = layers.Bidirectional(layers.LSTM(64, return_sequences=True, dropout=0.25))(x)
+
+    # output layer
+    x = layers.Dense(len(char_to_num.get_vocabulary()) + 1, activation="softmax", name="dense2")(x)
+
+    # add ctc layer for calculating ctc loss at each step
+    output = CTCLayer(name="ctc_loss")(labels, x)
+
+    # define the model
+    model = keras.models.Model(inputs=[input_img, labels], outputs = output, name="ocr_model_v1")
+
+    # optimizer
+    opt = keras.optimizers.Adam()
+
+    # compile the model
+    model.compile(optimizer=opt)
+    return model
+
+
+# get the model
+model = build_model()
+model.summary()
+
+
+# training
+epochs = 1
+early_stopping_patience = 10
+# add early stopping
+early_stopping = keras.callbacks.EarlyStopping(monitor="val_loss", patience=early_stopping_patience, restore_best_weights=True)
+
+# train the model
+# history = model.fit(train_dataset, validation_data = validation_dataset, epochs=epochs, callbacks=[early_stopping])
+
+
+# inference
+
+# get the prediction model by extracting layers till the output layer
+prediction_model = keras.models.Model(model.get_layer(name="image").input, model.get_layer(name="dense2").output)
+prediction_model.summary()
+
+
+# a utility function to decode the output of the network
+
