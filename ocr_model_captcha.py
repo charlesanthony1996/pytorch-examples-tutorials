@@ -207,13 +207,13 @@ model.summary()
 
 
 # training
-epochs = 1
+epochs = 100
 early_stopping_patience = 10
 # add early stopping
 early_stopping = keras.callbacks.EarlyStopping(monitor="val_loss", patience=early_stopping_patience, restore_best_weights=True)
 
 # train the model
-# history = model.fit(train_dataset, validation_data = validation_dataset, epochs=epochs, callbacks=[early_stopping])
+history = model.fit(train_dataset, validation_data = validation_dataset, epochs=epochs, callbacks=[early_stopping])
 
 
 # inference
@@ -224,4 +224,43 @@ prediction_model.summary()
 
 
 # a utility function to decode the output of the network
+def decode_batch_predictions(pred):
+    input_len = np.ones(pred.shape[0]) * pred.shape[1]
+
+    # use greedy search. for complex tasks, you can use beam search
+    results = keras.backend.ctc_decode(pred, input_length=input_len, greedy=True)[0][0][:, :max_length]
+
+    # iterate over the results and get back the text
+    output_text = []
+    for res in results:
+        res = tf.strings.reduce_join(num_to_char(res)).numpy().decode("utf-8")
+        output_text.append(res)
+
+    return output_text
+
+
+# lets check results on some validation samples
+for batch in validation_dataset.take(1):
+    batch_images = batch["image"]
+    batch_labels = batch["label"]
+
+    preds = prediction_model.predict(batch_images)
+    pred_texts = decode_batch_predictions(preds)
+
+    orig_texts = []
+    for label in batch_labels:
+        label = tf.strings.reduce_join(num_to_char(label)).numpy().decode("utf-8")
+        orig_texts.append(labels)
+
+    _, ax = plt.subplots(4, 4, figsize=(15, 15))
+    for i in range(len(pred_texts)):
+        img = (batch_images[i, : , :, 0] * 255).numpy().astype(np.uint8)
+        img = img.T
+        title = f"Prediction: {pred_texts[i]}"
+        ax[i // 4, i % 4].imshow(img, cmap="gray")
+        ax[i // 4, i % 4].set_title(title)
+        ax[i // 4, i % 4].axis("off")
+
+
+plt.show()
 
