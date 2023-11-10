@@ -93,3 +93,55 @@ def encode_single_sample(img_path, label):
 
 
     return {"image": img, "label": label}
+
+
+# create dataset
+train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
+
+train_dataset = (
+    train_dataset.map(
+        encode_single_sample, num_parallel_calls=tf.data.AUTOTUNE
+    )
+    .batch(batch_size)
+    .prefetch(buffer_size = tf.data.AUTOTUNE)
+)
+
+# visualize the data
+_, ax = plt.subplots(4, 4, figsize=(10, 5))
+for batch in train_dataset.take(1):
+    images = batch["image"]
+    labels = batch["label"]
+    for i in range(16):
+        img = (images[i] * 255).numpy().astype("uint8")
+        label = tf.strings.reduce_join(num_to_char(labels[i])).numpy().decode("utf-8")
+        ax[i // 4, i % 4].imshow(img[:, :, 0].T, cmap="gray")
+        ax[i // 4, i % 4].set_title(label)
+        ax[i // 4, i % 4].axis("off")
+
+# plt.show()
+
+
+
+class CTCLayer(layers.Layer):
+    def __init__():
+        super().__init__(name=name)
+        self.loss_fn = keras.backend.ctc_batch_cost
+
+
+    def call(self, y_true, y_pred):
+        # compute the training time loss value and add it
+        # to the layer using self.add_loss()
+        batch_len = tf.cast(tf.shape(y_true)[0], dtype='int64')
+        input_length = tf.cast(tf.shape(y_pred)[1], dtype='int64')
+        label_length = tf.cast(tf.shape(y_true)[1], dtype='int64')
+
+        input_length = input_length * tf.ones(shape=(batch_len, 1), dtype='int64')
+        label_length = label_length * tf.ones(shape=(batch_len, 1), dtype='int64')
+
+        loss = self.loss_fn(y_true, y_pred, input_length, label_length)
+        self.add_loss(loss)
+
+        # at test time , just return the computed predictions
+        return y_pred
+
+        
