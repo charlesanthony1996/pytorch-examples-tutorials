@@ -129,4 +129,35 @@ original_frames = example[10:, ...]
 # predict a new set of 10 frames
 for _ in range(10):
     # extract the models prediction and post process it
-    pass
+    new_prediction = model.predict(np.expand_dims(frames, axis=0))
+    new_prediction = np.squeeze(new_prediction, axis=0)
+    predicted_frame = np.expand_dims(new_prediction[-1, ...], axis=0)
+
+
+    # extend the set of prediction frames
+    frames = np.concatenate((frames, predicted_frame), axis=0)
+
+
+# construct a figure for the original and new frames
+fig, axes = plt.subplots(2, 10, figsize=(20, 4))
+print(fig)
+print(axes)
+
+
+# plot the original frames
+for idx, ax in enumerate(axes[0]):
+    ax.imshow(np.squeeze(original_frames[idx]), cmap="gray")
+    ax.set_title(f"frame {idx + 11}")
+    ax.axis("off")
+
+
+# plot the new frames
+new_frames = frames[10:, ...]
+for idx, ax in enumerate(axes[1]):
+    ax.imshow(np.squeeze(new_frames[idx]), cmap="gray")
+    ax.set_title(f"frame {idx + 11}")
+    ax.axis("off")
+
+
+# display the figure
+plt.show()
