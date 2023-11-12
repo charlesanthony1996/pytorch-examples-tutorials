@@ -211,4 +211,3 @@ for i in range(0, len(predicted_videos), 2):
         ]
     )
     display(box)
-
