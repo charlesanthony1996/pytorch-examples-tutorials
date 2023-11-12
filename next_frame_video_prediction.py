@@ -159,5 +159,56 @@ for idx, ax in enumerate(axes[1]):
     ax.axis("off")
 
 
-# display the figure
+# display the figure``
 plt.show()
+
+# predicted videos
+examples = val_dataset[np.random.choice(range(len(val_dataset)), size= 5)]
+
+print(examples)
+
+predicted_videos = []
+for example in examples:
+    # pick the first/last ten frames from the example
+    frames = example[:10, ...]
+    original_frames = example[10:, ...]
+    new_predictions = np.zeros(shape=(10, *frames[0].shape))
+
+    # predict a new set of 10 frames
+    for i in range(10):
+        # extract the models prediction and post process it
+        frames = example[: 10 + i + 1, ...]
+        new_prediction = model.predict(np.expand_dims(frames, axis= 0))
+        new_prediction = np.squeeze(new_prediction, axis= 0)
+        predicted_frame = np.expand_dims(new_prediction[-1, ...], axis = 0)
+
+
+        # extend the set of prediction frames
+        new_predictions[i] = predicted_frame
+
+
+    for frame_set in [original_frames, new_prediction]:
+        # construct a gif from the selected video frames
+        current_frames = np.squeeze(frame_set)
+        current_frames = current_frames[..., np.newaxis] * np.ones(3)
+        current_frames = (current_frames * 255).astype(np.uint8)
+        current_frames = list(current_frames)
+
+        # construct a gif from the frames
+        with io.BytesIO() as gif:
+            imageio.mimsave(gif, current_frames, "GIF", duration =5)
+            predicted_videos.append(gif.getvalue())
+
+
+# display the videos
+print(f"Truth\tPrediction")
+for i in range(0, len(predicted_videos), 2):
+    # construct and display an hbox with the ground truth and prediction
+    box = HBox(
+        [
+            widgets.Image(value = predicted_videos[i]),
+            widgets.Image(value = predicted_videos[i + 1])
+        ]
+    )
+    display(box)
+
