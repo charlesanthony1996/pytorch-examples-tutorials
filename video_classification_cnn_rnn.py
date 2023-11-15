@@ -78,7 +78,7 @@ def build_feature_extractor():
     preprocessed = preprocess_input(inputs)
 
     outputs = feature_extractor(preprocessed)
-    return keras.Model(inputs, outputs, name="feature extraction")
+    return keras.Model(inputs, outputs, name="feature_extractor")
 
 feature_extractor = build_feature_extractor()
 
@@ -222,9 +222,43 @@ def sequence_prediction(path):
     probabilities = sequence_model.predict([frame_features, frame_mask])[0]
 
     for i in np.argsort(probabilities)[::-1]:
-        print()
+        print(f"{class_vocab[i]}: {probabilities[i] * 100:5.2f}%")
+    return frames
 
 
+# this utility is for visualization
+# refer to https://www.tensorflow.org/hub/tutorials/action_recognition_with_tf_hub
+
+# def to_gif(images):
+#     converted_images = images.astype(np.uint8)
+#     imageio.mimsave("animation.gif", converted_images, duration=100)
+#     return embed.embed_file("animation.gif")
+
+# test_video = np.random.choice(test_df["video_name"].values.tolist())
+# print(f"test video path: {test_video}")
+# test_frames = sequence_prediction(test_video)
+# to_gif(test_frames[:max_seq_length])
+
+
+def to_gif(images):
+    # Ensure images is a sequence of ndarrays
+    if not isinstance(images, (list, np.ndarray)) or not all(isinstance(img, np.ndarray) for img in images):
+        raise ValueError("Input must be a sequence of ndarrays.")
+
+    # Convert to uint8 if necessary
+    converted_images = [img.astype(np.uint8) for img in images]
+
+    # Adjust duration for typical gif speed
+    duration = 0.1  # duration of each frame in seconds
+
+    imageio.mimsave("animation.gif", converted_images, duration = 100)
+    return embed.embed_file("animation.gif")
+
+
+test_video = np.random.choice(test_df["video_name"].values.tolist())
+print(f"test video path: {test_video}")
+test_frames = sequence_prediction(test_video)
+to_gif(test_frames[:max_seq_length])
 
 
 
