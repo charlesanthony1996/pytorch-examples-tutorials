@@ -34,7 +34,7 @@ train_df.sample(10)
 test_df.sample(10)
 
 
-def crop_centre_squre(frame):
+def crop_centre_square(frame):
     y, x = frame.shape[0: 2]
     min_dim = min(y, x)
     start_x = (x // 2) - (min_dim // 2)
@@ -149,6 +149,83 @@ print(f"frame features in test set: ", {test_data[1].shape})
 # the sequence model
 def get_sequence_model():
     class_vocab = label_processor.get_vocabulary()
+
+    frame_features_input = keras.Input((max_seq_length, num_features))
+    mask_input = keras.Input((max_seq_length,), dtype="bool")
+
+    # refer to the following tutorial to understand he significance of using mask
+    # https://keras.io/api/layers/recurrent_layers/gru/
+
+    x = keras.layers.GRU(16, return_sequences=True)(frame_features_input, mask = mask_input)
+    x = keras.layers.GRU(8)(x)
+    x = keras.layers.Dropout(0.4)(x)
+    x = keras.layers.Dense(8, activation="relu")(x)
+    output = keras.layers.Dense(len(class_vocab), activation="softmax")(x)
+
+    rnn_model = keras.Model([frame_features_input, mask_input], output)
+
+    rnn_model.compile(
+        loss="sparse_categorical_crossentropy", optimizer="adam", metrics=["accuracy"]
+    )
+
+    return rnn_model
+
+# utility for running experiences
+def run_experiment():
+    filepath = "/tmp/video_classifier"
+    checkpoint = keras.callbacks.ModelCheckpoint(
+        filepath, save_weights_only=True, save_best_only=True, verbose= 1
+    )
+    seq_model = get_sequence_model()
+    history = seq_model.fit(
+        [train_data[0], train_data[1]],
+        train_labels,
+        validation_split=0.3,
+        epochs = epochs,
+        callbacks=[checkpoint],
+    )
+
+    seq_model.load_weights(filepath)
+    _, accuracy =  seq_model.evaluate([test_data[0], test_data[1]], test_labels)
+    print(f"test accuracy :, {round(accuracy * 100, 2)}%")
+
+
+    return history, seq_model
+
+
+_, sequence_model = run_experiment()
+
+# inference
+def prepare_single_video(frames):
+    frames = frames[None, ...]
+    frame_mask = np.zeros(shape=(1, max_seq_length), dtype="bool")
+    frame_features = np.zeros(shape= (1, max_seq_length, num_features), dtype="float32")
+
+
+    for i, batch in enumerate(frames):
+        video_length = batch.shape[0]
+        length = min(max_seq_length, video_length)
+
+        for j in range(length):
+            frame_features[i, j, :] = feature_extractor.predict(batch[None, j, :])
+
+        frame_mask[i, :length] = 1
+
+    return frame_features, frame_mask
+
+
+def sequence_prediction(path):
+    class_vocab = label_processor.get_vocabulary()
+    
+    frames = load_video(os.path.join("test", path))
+    frame_features, frame_mask = prepare_single_video(frames)
+    probabilities = sequence_model.predict([frame_features, frame_mask])[0]
+
+    for i in np.argsort(probabilities)[::-1]:
+        print()
+
+
+
 
 
 
