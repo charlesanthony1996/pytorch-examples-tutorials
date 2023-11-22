@@ -46,4 +46,58 @@ weight_for_0 = 1.0/ counts[0]
 weight_for_1 = 1.0/counts[1]
 
 # normalize the data using training set statistics
-mean = null
+mean = np.mean(train_features, axis= 0)
+train_features -= mean
+val_features -= mean
+
+std = np.std(train_features, axis = 0)
+train_features /= std
+val_features /= std
+
+
+# build a binary classification model
+from tensorflow import keras
+
+model = keras.Sequential(
+    [
+        keras.layers.Dense(256, activation="relu", input_shape=(train_features.shape[-1],)
+        ),
+        keras.layers.Dense(256, activation="relu"),
+        keras.layers.Dropout(0.3),
+        keras.layers.Dense(256, activation="relu"),
+        keras.layers.Dropout(0.3),
+        keras.layers.Dense(1, activation="sigmoid"),
+    ]
+)
+
+# print(model)
+model.summary()
+
+# train the model with class_weight argument
+metrics = [
+    keras.metrics.FalseNegatives(name="fn"),
+    keras.metrics.FalsePositives(name="fp"),
+    keras.metrics.TrueNegatives(name="tn"),
+    keras.metrics.TruePositives(name="tp"),
+    keras.metrics.Precision(name="precision"),
+    keras.metrics.Recall(name="recall"),
+]
+
+print(metrics)
+
+model.compile(optimizer= keras.optimizers.Adam(1e-2), loss="binary_crossentropy", metrics=metrics)
+
+callbacks = [keras.callbacks.ModelCheckpoint("fraud_model_at_epoch_{epoch}.h5")]
+class_weight = {0: weight_for_0, 1: weight_for_1}
+
+
+model.fit(
+    train_features,
+    train_targets,
+    batch_size= 2048,
+    epochs = 30,
+    verbose = 2,
+    validation_data = (val_features, val_targets),
+    class_weight=class_weight
+)
+
