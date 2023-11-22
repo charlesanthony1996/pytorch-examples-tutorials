@@ -177,3 +177,35 @@ history = model.fit(train_data, validation_data = valid_data,epochs= epochs, use
 
 print(history)
 
+# evaluate model on the test set
+test_data = BertSemanticDataGenerator(
+    test_data[["sentence1", "sentence2"]].values.astype("str"),
+    y_test,
+    batch_size=batch_size,
+    shuffle=False
+)
+
+model.evaluate(test_data, verbose= 1)
+
+
+# inference on custom sentences
+def check_similarity(sentence1, sentence2):
+    sentence_pairs = np.array([[str(sentence1), str(sentence2)]])
+    test_data = BertSemanticDataGenerator(
+        sentence_pairs, labels=None, batch_size = 1, shuffle=False, include_targets=False
+    )
+
+    proba = model.predict(test_data[0])[0]
+    idx = np.argmax(proba)
+    proba = f"{proba[idx]: .2f%}"
+    pred = labels[idx]
+    return pred, proba
+
+
+
+sentence1 = "Two men are looking at something"
+sentence2 = "The two men are observing at with their eyes closed at something"
+
+check_similarity(sentence1, sentence2)
+
+
