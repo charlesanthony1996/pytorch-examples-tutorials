@@ -80,11 +80,41 @@ from IPython.display import Image, display
 loss, img = visualize_filter(0)
 keras.utils.save_img("0.png", img)
 
-display(Image("0.png"))
+# display(Image("0.png"))
 
 
 # visualize the first 64 filters in the target layer
 all_imgs = []
 
+for filter_index in range(64):
+    # print(filter_index)
+    print(f"processing filter %d" % (filter_index,))
+    loss, img = visualize_filter(filter_index)
+    all_imgs.append(img)
 
 
+margin = 5
+n = 8
+
+cropped_width = img_width - 25 * 2
+cropped_height = img_height - 25 * 2
+width = n * cropped_width + (n - 1) * margin
+height = n * cropped_height + (n - 1) * margin
+stitched_filters = np.zeros((width , height, 3))
+
+# fill the picture with our saved filters
+for i in range(n):
+    for j in range(n):
+        img = all_imgs[i * n + j]
+        stitched_filters[
+            (cropped_width + margin) * i : (cropped_width + margin) * i + cropped_width,
+            (cropped_height + margin) * j : (cropped_height + margin) * j + cropped_height,
+            :, 
+        ] = img
+
+
+keras.utils.save_img("stitched_filters.png", stitched_filters)
+
+from IPython.display import Image, display
+
+display(Image("stitched_filters.png"))
