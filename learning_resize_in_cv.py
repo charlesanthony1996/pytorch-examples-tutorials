@@ -157,3 +157,4 @@ model = get_model()
 model.compile(loss=keras.losses.CategoricalCrossentropy(label_smoothing=0.1), optimizer="sgd", metrics=["accuracy"])
 
 model.fit(train_ds, validation_data=validation_ds, epochs=epochs)
+
