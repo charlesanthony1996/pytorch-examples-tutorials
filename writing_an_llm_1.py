@@ -511,3 +511,15 @@ L.backward()
 
 test(got=x.derivative, want=Tensor(36))
 
+
+# checking a math sum from wolfram math
+x = Tensor(2)
+y = (
+    (Tensor(2) * x * x * x + Tensor(4) * x * x - Tensor(5) * x)
+    * (Tensor(3) * x * x - Tensor(2) * x + Tensor(7))
+    - (Tensor(6) * x * x * x * x + Tensor(2) * x * x * x - Tensor(8) * x * x)
+    + (Tensor(5) * x * x - Tensor(3) * x)
+)
+
+y.backward()
+test(got = x.derivative, want=Tensor(578))

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>indexed db example with vue 3</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@3.5.2/dist/vuetify.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@3.5.2/dist/vuetify.min.css" rel="stylesheet">
+    <!--    dexie js for sql like stuff-->
+    <script src="https://cdn.jsdelivr.net/npm/dexie@3.2.0/dist/dexie.min.js"></script>
+    <!--    vue router-->
+    <script src="https://unpkg.com/vue-router@4.0.15/dist/vue-router.global.js"></script>
+    <script src="https://unpkg.com/vue-router@4"></script>
+
+</head>
+
+<body>
+<div id="app">
+<!--    <v-app-bar>-->
+        <v-toolbar-title>Vue app with router</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn to="/">Home</v-btn>
+        <v-btn to="/about">About</v-btn>
+        <router-view></router-view>
+
+<!--    </v-app-bar>-->
+
+    <router-view></router-view>
+
+</div>
+</body>
+
+<script>
+    const { createApp, ref, computed, reactive, watch, watchEffect, onMounted } = Vue
+    const { createVuetify } = Vuetify
+
+    const vuetify = createVuetify()
+
+    // views
+    const HomeView = { template: '<div>Home</div>'}
+    const AboutView = { template: '<div>About</div>'}
+
+    // router setup
+    const router = VueRouter.createRouter({
+        history: VueRouter.createWebHistory(),
+        routes: [
+            { path: '/', component: HomeView },
+            { path: '/about', component: AboutView }
+        ]
+    })
+
+
+    const app = createApp({
+        setup() {
+
+            var db = new Dexie("database1")
+            db.version(1).stores({
+                friends: '++id, name, age'
+            })
+
+            db.friends.bulkAdd([
+            {name :"John Doe", age: 30},
+            {name: "Jane Doe", age: 27}
+            ])
+
+        //     query data
+            db.friends.where("age").below(29).toArray().then(function(youngFriends) {
+                console.log("Young friends: ", youngFriends[0].name )
+
+            }).catch(function(error) {
+                console.error("Error: ", error)
+            })
+            return {  }
+
+        }
+    }).use(vuetify).use(router).mount('#app')
+
+
+
+</script>
+
+
+
+<style>
+
+
+</style>
+</html>
