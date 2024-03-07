@@ -1,6 +1,41 @@
 # data set config
 # cats and dogs
 
+import os 
+import shutil
+
+original_dataset_dir = "/users/charles/downloads/dogs-vs-cats"
+
+base_dir = "/users/charles/downloads/dogs_vs_cats_small"
+
+os.mkdir(base_dir)
+
+train_dir = os.path.join(base_dir, "train")
+os.mkdir(train_dir)
+
+validation_dir = os.path.join(base_dir, "validation")
+os.mkdir(validation_dir)
+
+test_dir = os.path.join(base_dir, "test")
+os.mkdir(test_dir)
+
+
+
+train_cats_dir = os.path.join(train_dir, "cats")
+os.mkdir(train_cats_dir)
+
+
+train_dogs_dir = os.path.join(test_dir, "dogs")
+os.mkdir(train_dogs_dir)
+
+
+
+test_cats_dir = os.path.join(test_dir, "cats")
+os.mkdir(test_cats_dir)
+
+test_dogs_dir = os.path.join(train_dir, "dogs")
+os.mkdir(test_dogs_dir)
+
 
 
 
