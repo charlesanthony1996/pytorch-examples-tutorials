@@ -1,58 +1,50 @@
-import time
-import csv
-import matplotlib.pyplot as plt
 import pandas as pd
-from matplotlib.patches import Rectangle
+diamonds = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/diamonds.csv")
 
-df = pd.read_csv("annual-co2-emissions-austria.csv")
+# print(diamonds.head())
+# diamonds.drop(['carat', 'color', 'y'], axis=1, inplace=True)
+# print(diamonds.head())
 
-# select the last 10 years
-df_last_10_years = df.tail(10)
+# diamonds.drop([2, 4, 5], axis=0, inplace=True)
+# print(diamonds.head())
 
+# sort the cut series
+# result = diamonds.cut.sort_values(ascending=True)
+# print(result.head())
 
-# scatter plot
-# plt.scatter(df["Year"], df["Annual CO2 emissions"])
+# result = diamonds.price.sort_values(ascending=False)
+# print(result)
 
-# step plot
-# plt.step(df['Year'], df['Annual CO2 emissions'])
+# result = diamonds.sort_values('carat')
+# result = diamonds.sort_values('carat', ascending=False)
+# print(result)
 
-# fill between plot
-# plt.fill_between(df['Year'], df['Annual CO2 emissions'])
+# filter the dataframe rows to only how carat weight at least 0.3
+# booleans = []
+# for w in diamonds.carat:
+#     if w >= .3:
+#         booleans.append(True)
+#     else:
+#         booleans.append(False)
 
-# fill betweenx -> x axis
-# plt.fill_betweenx(df['Year'], df['Annual CO2 emissions'])
-
-# stairs plot
-# plt.stairs(df['Year'], df['Annual CO2 emissions'])
-
-# basic line plot for all years
-# plt.plot(df['Year'], df['Annual CO2 emissions'])
-
-# basic line plot for the last 10 years
-plt.plot(df_last_10_years['Year'], df_last_10_years['Annual CO2 emissions'])
-
-
-
+# print(booleans[0:20])
 
 
+# convert a python list to a pandas series
+l = [1, 3, 5, 7, 9, 11]
+# print(l)
 
-plt.title("Annual CO2 emissions in austria")
+result = pd.Series(l, dtype='float32')
+# print(result)
 
-plt.xlabel("Year")
-plt.ylabel("Annual CO2 emissions in MTPC")
+# result = diamonds[(diamonds.x > 5) & (diamonds.y > 5) & (diamonds.z > 5)]
+# print(result)
 
-# the background part
-fig = plt.gcf()
-fig.patch.set_facecolor("white")
+# result = diamonds[(diamonds.cut == 'Premium') | (diamonds.cut == 'Ideal')]
+# print(result)
 
-# create a rectangle
-x = df_last_10_years['Year'].iloc[5]
-y = df_last_10_years['Annual CO2 emissions'].iloc[5]
 
-width = 4
-height = df_last_10_years['Annual CO2 emissions'].iloc[6] - df_last_10_years['Annual CO2 emissions'].iloc[5]
+# find the diamonds that are with a fair or good or premium
+# result = diamonds[diamonds.cut.isin(['Fair', 'Good', 'Premium'])]
+# print(result)
 
-rect = Rectangle((x, y), width, height, linewidth= 1, edgecolor="black", facecolor="none")
-# plt.gca().add_patch(rect)
-
-# plt.show()
