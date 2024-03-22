@@ -154,4 +154,6 @@ plt.show()
 # sandals are very well classified, with some confusion with sneakers and ankle boots
 
 # potential improvements
-# 
+# more layers to decrease confusion
+# higher amount of training data
+# using convolutional neural networks which can learn to recognize more complex patterns, details
