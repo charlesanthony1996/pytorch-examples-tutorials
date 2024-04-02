@@ -165,7 +165,7 @@ result = pd.Series(l, dtype='float32')
 # print(result)
 
 # drop a row if any or all values in a row are missing of diamonds
-# result = diamonds.dropna(subset=['carat', 'cut'], how='any').shape
+# result = diamonds.dropna(subset=['carat', 'cut'], how='all').shape
 # print(result)
 
 
@@ -264,3 +264,12 @@ result = pd.Series(l, dtype='float32')
 
 # 
 # print(diamonds.loc[~diamonds.index.isin(result.index), :])
+
+
+# read the diamonds df and detect duplicate colors
+# print(diamonds.shape)
+# print(diamonds.clarity.duplicated().sum())
+
+# count the duplicate rows of dataframe
+# print(diamonds.duplicated().sum())
+# print(diamonds.shape)
