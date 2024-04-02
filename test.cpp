@@ -72,9 +72,24 @@ void Stack::delete_specific_element(Stack &stk, int element){
 
     int size = stk.top + 1;
     int temp[size];
+    int count = 0;
     
+    // copy stack elements into a temporary array
+    while(!stk.isEmpty()) {
+        int current = stk.pop();
+        if (current != element) {
+            temp[count++] = current;
+        } 
+    }
+
+    // push non matching elements back onto the stack
+    for(int i = count - 1; i >= 0; i--) {
+        stk.push(temp[i]);
+    }
+
 }
 
 int main() {
+    
     return 0;
 }
