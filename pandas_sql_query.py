@@ -36,8 +36,15 @@ locations = pd.read_csv(r"locations.csv")
 
 # display the name, salary and department number for those employees whose first name does not contain the letter
 # 'M'
-result = employees[employees['FIRST_NAME'].str.find('M') == -1]
-# print(result)
-for index, row in result.iterrows():
-    print(row['LAST_NAME'].ljust(15), row['FIRST_NAME'].ljust(15))
 
+# sql query -> select first_name, last_name, salary, department_id from employees where first_name not like '%M%';
+# result = employees[employees['FIRST_NAME'].str.find('M') == -1]
+# # print(result)
+# for index, row in result.iterrows():
+#     print(row['LAST_NAME'].ljust(15), row['FIRST_NAME'].ljust(15))
+
+
+# display the name, salary and department_id in ascending order by department number
+result = employees.sort_values('DEPARTMENT_ID', ascending=True)
+for index, row in result.iterrows():
+    print(row['FIRST_NAME'])
