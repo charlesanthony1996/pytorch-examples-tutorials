@@ -45,6 +45,15 @@ locations = pd.read_csv(r"locations.csv")
 
 
 # display the name, salary and department_id in ascending order by department number
-result = employees.sort_values('DEPARTMENT_ID', ascending=True)
-for index, row in result.iterrows():
-    print(row['FIRST_NAME'])
+# result = employees.sort_values('DEPARTMENT_ID', ascending=True)
+# for index, row in result.iterrows():
+#     print(row['FIRST_NAME'])
+
+
+# display the name, salary and department number
+# result = employees.sort_values('FIRST_NAME', ascending=False)
+# for index, row in result.iterrows():
+#     print(row['FIRST_NAME'].ljust(15))
+
+
+# 

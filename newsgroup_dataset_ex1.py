@@ -121,21 +121,21 @@ for epoch in range(num_epochs):
     print(f"Epoch {epoch + 1}: Train loss: {train_loss}, Train accuracy: {train_accuracy}")
 
     # validation
-    model.eval()
-    val_loss, val_correct, val_samples = 0, 0, 0
-    with torch.no_grad():
-        for texts, labels in tqdm(val_loader , desc="Validation", leave=False):
-            outputs = model(texts)
-            loss = criterion(outputs, labels)
+    # model.eval()
+    # val_loss, val_correct, val_samples = 0, 0, 0
+    # with torch.no_grad():
+    #     for texts, labels in tqdm(val_loader , desc="Validation", leave=False):
+    #         outputs = model(texts)
+    #         loss = criterion(outputs, labels)
 
-            val_loss += loss.item()
-            _, predicted = torch.max(outputs.data, 1)
-            val_correct += (predicted == labels).sum().item()
-            val_correct += labels.size(0)
+    #         val_loss += loss.item()
+    #         _, predicted = torch.max(outputs.data, 1)
+    #         val_correct += (predicted == labels).sum().item()
+    #         val_correct += labels.size(0)
 
-    val_loss /= len(val_loader)
-    val_accuracy = val_correct / val_samples
-    print(f"Validation samples: {val_loss}, Validation Accuracy: {val_accuracy}")
+    # val_loss /= len(val_loader)
+    # val_accuracy = val_correct / val_samples
+    # print(f"Validation samples: {val_loss}, Validation Accuracy: {val_accuracy}")
 
 
 
