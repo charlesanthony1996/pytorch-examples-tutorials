@@ -77,9 +77,9 @@ y_test_torch = torch.tensor(y_test, dtype=torch.long)
 train_dataset = TensorDataset(x_train, y_train_torch)
 val_dataset = TensorDataset(x_val, y_val_torch)
 test_dataset = TensorDataset(x_test, y_test_torch)
-train_loader = DataLoader(train_dataset, batch_size = 8, shuffle=True, num_workers=0)
-val_loader = DataLoader(val_dataset, batch_size=8, shuffle=True, num_workers=0)
-test_loader = DataLoader(test_dataset, batch_size = 8, shuffle=True, num_workers=0)
+train_loader = DataLoader(train_dataset, batch_size = 32, shuffle=True, num_workers=0)
+val_loader = DataLoader(val_dataset, batch_size=32, shuffle=True, num_workers=0)
+test_loader = DataLoader(test_dataset, batch_size = 32, shuffle=True, num_workers=0)
 
 # model, loss and optimizer
 vocab_size = len(vocab)
@@ -105,20 +105,40 @@ for epoch in range(num_epochs):
         optimizer.zero_grad()
         # print(texts.shape)
         outputs = model(texts)
-    #     loss = criterion(outputs, labels)
-    #     loss.backward()
-    #     optimizer.step()
+        loss = criterion(outputs, labels)
+        loss.backward()
+        optimizer.step()
 
 
-    #     total_loss += loss.item()
-    #     _, predicted = torch.max(outputs.data, 1)
-    #     total_correct += (predicted == labels).sum().item()
-    #     total_samples += labels.size(0)
+        total_loss += loss.item()
+        _, predicted = torch.max(outputs.data, 1)
+        total_correct += (predicted == labels).sum().item()
+        total_samples += labels.size(0)
 
 
-    # train_loss = total_loss / len(train_loader)
-    # train_accuracy = total_correct / total_samples
-    # print(f"Epoch {epoch + 1}: Train loss: {train_loss}, Train accuracy: {train_accuracy}")
+    train_loss = total_loss / len(train_loader)
+    train_accuracy = total_correct / total_samples
+    print(f"Epoch {epoch + 1}: Train loss: {train_loss}, Train accuracy: {train_accuracy}")
+
+    # validation
+    model.eval()
+    val_loss, val_correct, val_samples = 0, 0, 0
+    with torch.no_grad():
+        for texts, labels in tqdm(val_loader , desc="Validation", leave=False):
+            outputs = model(texts)
+            loss = criterion(outputs, labels)
+
+            val_loss += loss.item()
+            _, predicted = torch.max(outputs.data, 1)
+            val_correct += (predicted == labels).sum().item()
+            val_correct += labels.size(0)
+
+    val_loss /= len(val_loader)
+    val_accuracy = val_correct / val_samples
+    print(f"Validation samples: {val_loss}, Validation Accuracy: {val_accuracy}")
+
+
+
 
 
 
