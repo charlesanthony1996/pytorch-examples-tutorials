@@ -56,4 +56,16 @@ locations = pd.read_csv(r"locations.csv")
 #     print(row['FIRST_NAME'].ljust(15))
 
 
-# 
+# create a boolean series, where true for not null and False for null values for
+# or missing values in specified column
+# pd.set_option('display.max_rows', 500)
+# pd.set_option('display.max_columns', 500)
+
+# print('original data / state province')
+# print(locations.STATE_PROVINCE)
+
+
+# display the name, salary and department number for those employees whose first
+# name ends with the letter 'm'
+# result = employees[employees['FIRST_NAME'].str[-1] == 'm']
+# print(result)

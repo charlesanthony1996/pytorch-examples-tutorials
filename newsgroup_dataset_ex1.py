@@ -21,6 +21,7 @@ class Classifier(nn.Module):
         self.lstm1 = nn.LSTM(embedding_dim, hidden_dim, batch_first = True)
         self.lstm2 = nn.LSTM(hidden_dim, hidden_dim, batch_first=True)
         # uncomment this layer, just for testing
+        # keep the layer, training time is decent
         self.gru = nn.GRU(hidden_dim, hidden_dim, batch_first=True)
         self.fc = nn.Linear(hidden_dim, output_dim)
         self.softmax = nn.Softmax(dim = 1)
@@ -96,11 +97,15 @@ optimizer = Adam(model.parameters(), lr=1e-4)
 
 
 # training loop
-num_epochs = 5
+num_epochs = 10
+train_losses, val_losses = [], []
+train_accuracies, val_accuracies = [], []
+
+
 for epoch in range(num_epochs):
     model.train()
     total_loss, total_correct, total_samples  = 0, 0, 0
-    print("okay")
+    print("level 1")
     for texts, labels in tqdm(train_loader, desc=f"Epoch {epoch + 1}/{num_epochs}", leave=False):
         optimizer.zero_grad()
         # print(texts.shape)
@@ -115,30 +120,55 @@ for epoch in range(num_epochs):
         total_correct += (predicted == labels).sum().item()
         total_samples += labels.size(0)
 
+    train_losses.append(total_loss / len(train_loader))
+    train_accuracies.append(total_correct / total_samples)
 
-    train_loss = total_loss / len(train_loader)
-    train_accuracy = total_correct / total_samples
-    print(f"Epoch {epoch + 1}: Train loss: {train_loss}, Train accuracy: {train_accuracy}")
+
+    # train_loss = total_loss / len(train_loader)
+    # train_accuracy = total_correct / total_samples
+    # print(f"Epoch {epoch + 1}: Train loss: {train_loss}, Train accuracy: {train_accuracy}")
 
     # validation
-    # model.eval()
-    # val_loss, val_correct, val_samples = 0, 0, 0
-    # with torch.no_grad():
-    #     for texts, labels in tqdm(val_loader , desc="Validation", leave=False):
-    #         outputs = model(texts)
-    #         loss = criterion(outputs, labels)
+    model.eval()
+    val_loss, val_correct, val_samples = 0, 0, 0
+    with torch.no_grad():
+        for texts, labels in tqdm(val_loader , desc="Validation", leave=False):
+            outputs = model(texts)
+            loss = criterion(outputs, labels)
 
-    #         val_loss += loss.item()
-    #         _, predicted = torch.max(outputs.data, 1)
-    #         val_correct += (predicted == labels).sum().item()
-    #         val_correct += labels.size(0)
+            val_loss += loss.item()
+            _, predicted = torch.max(outputs.data, 1)
+            val_correct += (predicted == labels).sum().item()
+            val_samples += labels.size(0)
+
+    val_losses.append(val_loss / len(val_loader))
+    val_accuracies.append(val_correct / val_samples)
 
     # val_loss /= len(val_loader)
     # val_accuracy = val_correct / val_samples
     # print(f"Validation samples: {val_loss}, Validation Accuracy: {val_accuracy}")
 
+    print(f"Epoch {epoch + 1}: Train loss: {train_losses[-1]:.4f}, Train accuracy: {train_accuracies[-1]:.4f}, "
+          f"Val loss: {val_losses[-1]:.4f}, Val accuracy: {val_accuracies[-1]:.4f}")
 
 
+# plotting
+plt.figure(figsize=(12, 5))
 
+plt.subplot(1, 2, 1)
+plt.plot(range(1, num_epochs + 1), train_losses, label="Training accuracy")
+plt.plot(range(1, num_epochs + 1), val_losses, label="Validation accuracy")
+plt.title("loss per epoch")
+plt.xlabel("epoch")
+plt.ylabel("loss")
+plt.show()
+
+plt.subplot(1, 2, 2)
+plt.plot(range(1, num_epochs + 1), train_accuracies, label="Training accuracies")
+plt.plot(range(1, num_epochs + 1), val_accuracies, label="Validation accuracy")
+plt.title("accuracy per epoch")
+plt.xlabel("epoch")
+plt.ylabel("accuracy")
+plt.show()
 
 
