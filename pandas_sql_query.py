@@ -69,3 +69,4 @@ locations = pd.read_csv(r"locations.csv")
 # name ends with the letter 'm'
 # result = employees[employees['FIRST_NAME'].str[-1] == 'm']
 # print(result)
+
