@@ -7,7 +7,7 @@ import seaborn as sns
 import plotly.express as px
 
 # load the data
-data = pd.read_csv("/users/charles/desktop/pytorch-examples-tutorials/historical-material-data.csv")
+data = pd.read_csv("https://raw.githubusercontent.com/charlesanthony1996/billionaires_dataset/main/historical-material-data.csv")
 
 # print(data.head())
 
@@ -31,6 +31,34 @@ fig.add_annotation(x=max_point["Date"].values[0], y= max_point["Quantity"].value
 
 fig.show()
 
+#=============================
+
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+
+# Load the data
+data = pd.read_csv("https://raw.githubusercontent.com/charlesanthony1996/billionaires_dataset/main/historical-material-data.csv")
+data["Date"] = pd.to_datetime(data["Date"])  # Converting the 'Date' column to datetime
+
+# Plotting material usage over time using Matplotlib and Seaborn
+plt.figure(figsize=(10, 6))  # Set the figure size
+sns.lineplot(data=data, x="Date", y="Quantity", hue="Material_Type", palette="tab10")  # Create a line plot
+
+# Adding title and labels
+plt.title("Material usage over time")
+plt.xlabel("Date")
+plt.ylabel("Usage Quantity")
+
+# Annotate the maximum point
+max_point = data[data["Quantity"] == data["Quantity"].max()]
+plt.annotate('Maximum', xy=(max_point["Date"].values[0], max_point["Quantity"].values[0]), 
+             xytext=(max_point["Date"].values[0], max_point["Quantity"].values[0] + 50), 
+             arrowprops=dict(facecolor='black', shrink=0.05))
+
+plt.show()
+
+
 # ===========================
 
 # heatmap of material and product type
@@ -41,7 +69,7 @@ import numpy as np
 import seaborn as sns
 
 # load the data 
-df = pd.read_csv("/users/charles/desktop/pytorch-examples-tutorials/historical-material-data.csv")
+df = pd.read_csv("https://raw.githubusercontent.com/charlesanthony1996/billionaires_dataset/main/historical-material-data.csv")
 
 # print(df.tail())
 
@@ -53,28 +81,27 @@ plt.show()
 
 # heatmap of material and product type using plotly
 import pandas as pd
-import plotly.figure_factory as ff
+import seaborn as sns
+import matplotlib.pyplot as plt
 
-# load the data
-df = pd.read_csv("/users/charles/desktop/pytorch-examples-tutorials/historical-material-data.csv")
+# Load the data
+df = pd.read_csv("https://raw.githubusercontent.com/charlesanthony1996/billionaires_dataset/main/historical-material-data.csv")
 
-# heatmap data
-heatmap_data = df.groupby(["Material_Type", "Product_Type"]).size().unstack(fill_value = 0)
+# Heatmap data preparation
+heatmap_data = df.groupby(["Material_Type", "Product_Type"]).size().unstack(fill_value=0)
 
-# create a heatmap using plotly
-fig = ff.create_annotated_heatmap(
-    z= heatmap_data.values,
-    x= heatmap_data.columns.tolist(),
-    y= heatmap_data.index.tolist(),
-    colorscale="Viridis",
-    showscale=True,
-    annotation_text=heatmap_data.values
-)
+# Create a heatmap using seaborn
+plt.figure(figsize=(10, 8))
+sns.heatmap(heatmap_data, annot=True, fmt="d", cmap="Viridis", cbar=True)
 
-# update layout
-fig.update_layout(title="Material vs Product type", xaxis_title="Product Type", yaxis_title="Material Type")
+# Update layout
+plt.title('Material vs Product Type')
+plt.xlabel('Product Type')
+plt.ylabel('Material Type')
 
-fig.show()
+# Show plot
+plt.show()
+
 
 
 # =========================
@@ -86,7 +113,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 
-df = pd.read_csv("/users/charles/desktop/pytorch-examples-tutorials/historical-material-data.csv")
+df = pd.read_csv("https://raw.githubusercontent.com/charlesanthony1996/billionaires_dataset/main/historical-material-data.csv")
 
 # print(df.info())
 
@@ -98,26 +125,33 @@ plt.show()
 
 
 import pandas as pd
-import plotly.express as px
+import matplotlib.pyplot as plt
+import numpy as np
 
-# sample data loading (adjust the path as needed)
-df = pd.read_csv("/users/charles/desktop/pytorch-examples-tutorials/historical-material-data.csv")
+# Sample data loading
+df = pd.read_csv("https://raw.githubusercontent.com/charlesanthony1996/billionaires_dataset/main/historical-material-data.csv")
 
-print(df.head())
+# Expanding the angles column
+angles = df["Angles"].str.split(",", expand=True).stack().astype(float)
 
-# expanding the angles column
-angles = df["Angles"].str.split(",", expand=True).stack().astype(float).reset_index(drop=True)
+# Create histogram
+plt.figure(figsize=(10, 6))
+counts, bins, patches = plt.hist(angles, bins=30, color='#636EFA', edgecolor='black')
 
-# create histogram using plotly
-fig = px.histogram(angles,nbins=30, title="Histogram of bend angles", labels={'value': 'Bend Angles', 'count': 'Frequency'},
- color_discrete_sequence=['#636EFA'], marginal="box")
+# Calculate median and add median line
+median_angle = angles.median()
+plt.axvline(median_angle, color='green', linestyle='dashed', linewidth=2, label=f'Median: {median_angle:.2f} degrees')
 
-fig.add_shape(type="line", x0=angles.median(), x1=angles.median(), y0=0, y1=1, yref="paper",
- line=dict(color="green", width= 2, dash="dash"), name="Median")
+# Add labels, title, and legend
+plt.xlabel('Bend Angles (degrees)')
+plt.ylabel('Frequency')
+plt.title('Histogram of Bend Angles')
+plt.legend()
 
-fig.update_layout(xaxis_title="Bend angles(degrees)", yaxis_title="Frequency", legend_title="Statistics", hovermode="closest")
+# Show plot
+plt.grid(True)
+plt.show()
 
-fig.show()
 
 
 
@@ -144,7 +178,7 @@ import pandas as pd
 import plotly.express as px
 
 # load the data (adjust the path as needed)
-df = pd.read_csv("/users/charles/desktop/pytorch-examples-tutorials/historical-material-data.csv")
+df = pd.read_csv("https://raw.githubusercontent.com/charlesanthony1996/billionaires_dataset/main/historical-material-data.csv")
 
 # create scatter plot using plotly
 fig = px.scatter(df,x="Thickness_mm", y="Quantity", color="Material_Type", title="Thickness vs Quantity",

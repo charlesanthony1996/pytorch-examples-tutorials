@@ -1,0 +1,17 @@
+{
+    "colorDetails": "Color Details",
+    "hexValue": "Hex Value",
+    "rgbValue": "RGB Value",
+    "core.hmi.general.rawMaterials.deleteRawMaterialText": "The raw material will be deleted permanently",
+    "core.hmi.general.rawMaterials.deleteRawMaterial": "Delete Raw Material",
+    "core.hmi.general.materials.coils.deleteCoil": "The coil will be deleted permanently",
+    "core.hmi.general.rawMaterials.deleteCoilText": "The coating will be deleted permanently",
+    "core.hmi.general.materials.deleteMaterial": "Delete Material",
+    "core.hmi.general.materials.deleteMaterialText": "The material will be deleted permanently",
+    "core.hmi.general.materials.deleteCoating": "Delete Coating",
+    "core.hmi.general.materials.deleteCoatingText": "The coating will be deleted permanently",
+    "core.hmi.general.materials.color.deleteColor": "Delete Color",
+    "core.hmi.general.materials.color.deleteColorText": "The coating will be deleted permanently",
+    "core.hmi.general.headers.executing": "executing",
+    "core.hmi.general.headers.stopped": "stopped"
+  }

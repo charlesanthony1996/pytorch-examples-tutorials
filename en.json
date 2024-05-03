@@ -1,0 +1,346 @@
+{
+    "language": "language",
+    "hello": "hello",
+    "description": "this is a protected page",
+    "core": {
+        "hmi": {
+          "general": {
+            "headers": {
+              "coilFarm": "COILFARM",
+              "settings": "SETTINGS"
+            },
+            "buttons": {
+              "save": "Save",
+              "cancel": "Cancel",
+              "back": "Back",
+              "pause": "Pause",
+              "close": "Close",
+              "confirmAndMove": "Confirm & Move",
+              "toggle": {
+                "on": "on",
+                "off": "off"
+              },
+              "filter": "Filter",
+              "selectPlaceAndConfirm": "Select place & confirm",
+              "placeholder": "Placeholder"
+            },
+            "materials": {
+              "singular": "Material",
+              "plural": "Materials",
+              "freeSpace": "Free space",
+              "save": "Save material",
+              "saveMaterialText": "Are you sure to change all existing coils?",
+              "materialLeft": "Material left",
+              "addMaterial": "Add Material",
+              "addNewRawMaterial": "Add New Raw Material",
+              "changeMaterial": "Change Material",
+              "deleteMaterial": "Delete Material",
+              "deleteMaterialText": "The material will be deleted permanently",
+              "weight": {
+                "initial": "Initial weight",
+                "remaining": "Remaining weight",
+                "available": "available"
+              },
+              "processing": {
+                "processingData": "Processing Data",
+                "name": "Processing",
+                "edit": "Edit processing data",
+                "save": "Save processing data",
+                "straightening": "Straightening",
+                "overlap": "Overlap",
+                "kerf": "Kerf",
+                "createProcessingFor": "create processing data for",
+                "saveProcessingText": "Just choose whether you want to change material-specific and not coil-specific!",
+                "saveProcessingTextMaterial": "You will change all coil-specific processing!",
+                "materialSpecific": "material-specific"
+              },
+            "thickness": "Thickness",
+              "perforated": "Perforated",
+              "coating": "Coating",
+              "addCoating": "Add Coating",
+              "deleteCoating": "Delete Coating",
+              "deleteCoatingText": "The coating will be deleted permanently",
+              "addColor": "Add Color",
+              "color": {
+                "singular": "Color",
+                "plural": "Colors",
+                "front": "Front",
+                "back": "Back",
+                "deleteColor": "Delete Color",
+                "deleteColorText": "The color will be deleted permanently"
+              },
+              "colorDetails": "Color Details",
+              "hexValue": "Hex Value",
+              "rgbValue": "RGB Value",
+              "foil": "Foil",
+              "coils": {
+                "singular": "Coil",
+                "plural": "Coils",
+                "innerDiameter": "Diameter (inner)",
+                "outerDiameter": "Diameter (outer)",
+                "addEmptyCoil": "Add empty coil",
+                "moveCoilIn": "Move coil in",
+                "deleteCoil": "Delete coil",
+                "deleteCoilText": "The coil will be deleted permanently"
+              },
+              "coilPlaces": {
+                "singularLong": "Coil place",
+                "pluralLong": "Coil places",
+                "singular": "Place",
+                "plural": "Places"
+              }
+            },
+            "rawMaterials": {
+              "singular": "Raw Material",
+              "plural": "Raw Materials",
+              "newRawMaterial": "New raw material",
+              "addRawMaterial": "Add Raw Material",
+              "deleteRawMaterial": "Delete Raw Material",
+              "deleteRawMaterialText": "The raw material will be deleted permanently"
+            },
+            "name": "Name",
+            "notes": {
+              "singular": "Note",
+              "plural": "Notes"
+            },
+            "number": "Number",
+            "usage": "Usage",
+            "search": "Search",
+            "details": {
+              "singular": "Detail",
+              "plural": "Details"
+            },
+            "login": {
+              "name": "Login",
+              "password": "Password",
+              "logout": "Logout"
+            },
+            "filter": {
+              "name": "Filter",
+              "resetFilter": "Reset filter"
+            },
+            "type": "Type",
+            "status": "Status",
+            "waiting": "waiting",
+            "label": "Label",
+            "email": "Email",
+            "available": "Available",
+            "yes": "yes",
+            "no": "no",
+            "standard": "standard",
+            "advanced": "advanced",
+            "executing": "executing",
+            "stopped": "stopped"
+          }
+        },
+        "plc": {
+          "hmi": {
+            "saveButton": "@:core.hmi.general.buttons.save"
+          },
+          "enabled": "PLC Enabled",
+          "connection": {
+            "opc": {
+              "host": "PLC Host",
+              "port": "PLC Port"
+            }
+          },
+          "interval": {
+            "readStateActive": "Read Internal Active",
+            "readStateInactive": "Read Internal Inactive",
+            "keepAlive": "Keep Alive Interval"
+          }
+        },
+        "locale": {
+          "hmi": {
+            "saveButton": "@:core.hmi.general.buttons.save"
+          },
+          "language": {
+            "singular": "Language",
+            "default": "Default Language",
+            "available": "Available Language"
+          },
+          "date": {
+            "dateFormat": "Date Format",
+            "dateTimeFormat": "Date Time Format",
+            "timeFormat": "Time Format",
+            "time": "Time"
+          },
+          "units": {
+            "singular": "unit",
+            "plural": "units",
+            "length": "Length",
+            "lengthHighPrecision": "Length High Precision",
+            "area": "Area",
+            "weight": "Weight",
+            "density": "Density",
+            "width": "Width",
+            "g/cm": "g/cm"
+          }
+        }
+    },
+    "module": {
+        "coilfarm": {
+          "hmi": {
+            "infeed": "Infeed",
+            "decoiler": "Decoiler",
+            "setup": "Setup",
+            "buffer": "Buffer",
+            "state": "States",
+            "action": "Actions",
+            "setting": "Settings",
+            "error": "Error",
+            "warning": "Warning",
+            "userSettings": "User Settings",
+            "actions": {
+              "newCoil": "Create new Coil"
+            },
+            "coilfarm": "Coilfarm",
+            "materials": "Materials",
+            "messages": "Messages",
+            "station": "Station",
+            "clamping": "Clamping",
+            "table": "Table",
+            "feeding": "Feeding"
+          },
+          "portal": {
+            "name": "Portal",
+            "xAxis": "X Axis",
+            "yAxis": "Y Axis",
+            "zAxis": "Z Axis",
+            "hook": "Hook"
+          },
+          "tasks": {
+            "singular": "Task",
+            "plural": "Tasks",
+            "noActiveTasks": "No active tasks running at the moment",
+            "nextTasks": "Next Tasks"
+          },
+          "coilSetup": {
+            "insertCoil": "Insert Coil",
+            "confirmMoveIn": "Confirm coil & move in",
+            "coilAligned": "The coil is properly aligned in the setup place",
+            "mandrelAssembled": "The mandrel is properly assembled and secured",
+            "coilOnPlace": "The coil will be placed on place"
+          },
+          "topRightMenu": {
+            "coilView": "Coil View",
+            "listView": "List View"
+          },
+          "actions": {
+            "moveOut": "Move coil out",
+            "threadIn": "Thread in",
+            "threadOut": "Thread out",
+            "moveToPlace": "Move to place"
+          },
+          "setting": {
+            "system": "System",
+  
+            "hmi": {
+              "coilFarmSetting": "Coilfarm Setting",
+              "portalButton": "@:module.coilfarm.portal.name",
+              "portalTitle": "@:module.coilfarm.portal.name",
+              "setupButton": "@:module.coilfarm.hmi.setup",
+              "setupTitle": "@:module.coilfarm.hmi.setup",
+              "bufferTitle": "@:module.coilfarm.hmi.buffer",
+              "bufferButton": "@:module.coilfarm.hmi.buffer",
+              "decoilerButton": "@:module.coilfarm.hmi.decoiler",
+              "decoilerTitle": "@:module.coilfarm.hmi.decoiler",
+              "infeedButton": "@:module.coilfarm.hmi.infeed",
+              "infeedTitle": "@:module.coilfarm.hmi.infeed",
+              "infeedTabs": {
+                "feedingRoller": "Feeding Roller",
+                "edgeGuide": "Edge Guide",
+                "edgeDetection": "Edge Detection",
+                "masterEncoder": "Master Encoder"
+              }
+            },
+            "technician": {
+              "settings": "Technician Settings",
+              "name": "Technician",
+              "infiniteCoilPLacement": "Infinite coil placement",
+              "infiniteThreadIn": "Infinite thread in",
+              "deleteCoilfarmTasks": "Delete Coilfarm Tasks"
+            },
+            "roleManagement": {
+              "name": "Role",
+              "addRole": "Add Role"
+            },
+            "production": {
+              "singular": "Production",
+              "name": "Production Setting"
+            },
+            "localization": {
+              "name": "Localization"
+            },
+            "usersettings": {
+              "hmi": {
+                "usersettingsButton":"@:module.coilfarm.hmi.userSettings",
+                "usersettingsTitle":"@:module.coilfarm.hmi.userSettings",
+                "admin": "Admin",
+                "user": "User",
+                "create": "Create or Update a User",
+                "addUser": "Add User",
+                "addRole": "Add Role",
+                "userManagement": "User Management"
+              }
+            },
+            "permission": {
+              "singular": "Permission",
+              "plural": "Permissions",
+              "description": "Description"
+            },
+            "plc": {
+              "name": "PLC Config",
+              "plc": "PLC"
+            }
+          },
+          "state": {
+            "hmi": {
+              "general": "General",
+              "locking": "Locking",
+              "drive": "Drive",
+              "sensor": "Sensor",
+              "measurement": "Measurement",
+              "target": "Target",
+              "total": "Total",
+              "maint": "Maintenance",
+              "diameter": "Diameter",
+              "fan": "Fan",
+              "clutch": "Clutch",
+              "pressure": "Pressure",
+              "clamp": "Clamp",
+              "swivel": "Swivel",
+              "actuator": "Actuator",
+              "engage": "Engage",
+              "reset": "Reset",
+              "opCounter": "Op counter",
+              "loweringArea": "Lowering area",
+              "forceLeft": "Force left",
+              "forceRight": "Force right"
+            }
+          },
+          "message": {
+            "actual": "Actual",
+            "searchMessage": "Search messages",
+            "history": "History",
+            "module": {
+              "module":{
+                "singular": "Module",
+                "plural": "Modules"
+              }
+            },
+            "code": "Code",
+            "title": "Title",
+            "time": "Time",
+            "noActiveMsg": "No active messages at the moment",
+            "noActivePromptMsg": "No active prompt messages to show at this moment",
+            "noActiveWarningMsg": "No active warning messages to show at this moment",
+            "noHistoMsg": "No historical messages at the moment",
+            "noHistoErrorMsg": "No historical error messages to show at this moment",
+            "noHistoWarningMsg": "No historical warning messages to show at this moment",
+            "noHistoPromptMsg": "No historical prompt messages to show at this moment"
+          }
+        }
+    }
+  }
+  
