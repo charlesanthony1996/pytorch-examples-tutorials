@@ -1,0 +1,41 @@
+Tech Tree
+├── Python
+│   └── Basic Dataset
+│       ├── Tensor
+│       │   ├── Basic Operations
+│       │   └── Autograd
+│       │       ├── Mean Squared Error
+│       │       └── Cross Entropy
+│       │           └── Backpropagation
+│       │               └── Linear Layer
+│       │                   ├── Relu
+│       │                   ├── Sigmoid
+│       │                   ├── GELU
+│       │                   ├── Swish
+│       │                   └── SiLU
+│       │                       └── Multi-Layer Perceptron
+│       │                           └── Attention
+│       │                               └── Multi-head Attention
+│       │                                   └── Transformer Block
+│       │                                       └── Transformer
+│       │                                           ├── Small Language Model
+│       │                                           ├── Modern Language Model
+│       │                                           │   └── Quantization
+│       │                                           ├── Batch Norm
+│       │                                           ├── Layer Norm
+│       │                                           └── RMSNorm
+└── Data Collection
+    └── Data Cleaning
+        ├── Tokenization
+        ├── Byte Pair Encoding
+        │   ├── Causal Language Modelling
+        │   └── Positional Encoding
+        │       └── Rotary Positional Encoding
+└── Batching
+└── Stochastic Gradient Descent
+    ├── Weight Decay
+    ├── Momentum
+    ├── Gradient Clipping
+    ├── Adadelta
+    └── Hyperparameter Tuning
+        └── Learning Rate Scaling Laws
