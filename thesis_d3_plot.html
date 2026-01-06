@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Parts Distribution by Quantity against Width</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .bar {
+            fill: steelblue;
+        }
+        .bar:hover {
+            fill: darkorange;
+        }
+        .axis-label {
+            font: 14px sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        const data = [
+            {
+                "Week": "Week 1",
+                "Width 200mm": 27,
+                "Width 300mm": 50,
+                "Width 400mm": 32,
+                "Width 500mm": 37,
+                "Width 600mm": 45,
+                "Width 700mm": 67,
+                "Width 800mm": 82,
+                "Width 900mm": 53,
+                "Width 1000mm": 38,
+                "Width 1100mm": 20,
+            },
+            {
+                "Week": "Week 2",
+                "Width 200mm": 25,
+                "Width 300mm": 30,
+                "Width 400mm": 28,
+                "Width 500mm": 33,
+                "Width 600mm": 22,
+                "Width 700mm": 27,
+                "Width 800mm": 24,
+                "Width 900mm": 31,
+                "Width 1000mm": 26,
+                "Width 1100mm": 20
+            },
+            {
+                "Week": "Week 3",
+                "Width 200mm": 20,
+                "Width 300mm": 27,
+                "Width 400mm": 29,
+                "Width 500mm": 24,
+                "Width 600mm": 23,
+                "Width 700mm": 30,
+                "Width 800mm": 22,
+                "Width 900mm": 26,
+                "Width 1000mm": 25,
+                "Width 1100mm": 21
+            },
+            {
+                "Week": "Week 4",
+                "Width 200mm": 28,
+                "Width 300mm": 32,
+                "Width 400mm": 30,
+                "Width 500mm": 29,
+                "Width 600mm": 27,
+                "Width 700mm": 31,
+                "Width 800mm": 26,
+                "Width 900mm": 24,
+                "Width 1000mm": 28,
+                "Width 1100mm": 22
+            },
+            {
+                "Week": "Week 5",
+                "Width 200mm": 29,
+                "Width 300mm": 28,
+                "Width 400mm": 26,
+                "Width 500mm": 27,
+                "Width 600mm": 25,
+                "Width 700mm": 30,
+                "Width 800mm": 23,
+                "Width 900mm": 29,
+                "Width 1000mm": 21,
+                "Width 1100mm": 20
+            }
+        ]
+
+        const margin = {top: 50, right: 60, bottom: 70, left: 40},
+              width = 600 - margin.left - margin.right,
+              height = 400 - margin.top - margin.bottom
+
+        data.forEach(weekData => {
+            const svg = d3.select("body").append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+            const x = d3.scaleBand()
+                .domain(Object.keys(weekData).filter(key => key !== 'Week'))
+                .range([0, width])
+                .padding(0.1)
+
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(Object.values(weekData).filter(value => typeof value === 'number'))])
+                .nice()
+                .range([height, 0])
+
+            svg.append("g")
+                .selectAll(".bar")
+                .data(Object.entries(weekData).filter(([key, value]) => key !== 'Week'))
+                .enter().append("rect")
+                .attr("class", "bar")
+                .attr("x", d => x(d[0]))
+                .attr("y", d => y(d[1]))
+                .attr("width", x.bandwidth())
+                .attr("height", d => height - y(d[1]))
+
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x))
+                .selectAll("text")
+                .style("text-anchor", "end")
+                .attr("dx", "-.8em")
+                .attr("dy", ".15em")
+                .attr("transform", "rotate(-45)")
+
+            svg.append("g")
+                .attr("class", "y axis")
+                .call(d3.axisLeft(y))
+
+            svg.append("text")
+                .attr("x", width / 2)
+                .attr("y", height + margin.bottom)
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .attr("class", "axis-label")
+                .text("Part Width")
+
+            svg.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 0 - margin.left)
+                .attr("x", 0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .attr("class", "axis-label")
+                .text("Number of Parts")
+
+            svg.append("text")
+                .attr("x", width / 2)
+                .attr("y", 0 - (margin.top / 2))
+                .attr("text-anchor", "middle")
+                .style("font-size", "16px")
+                .style("text-decoration", "underline")
+                .text(weekData.Week)
+        })
+    </script>
+</body>
+</html>
