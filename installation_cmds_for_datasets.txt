@@ -1,0 +1,7 @@
+python -c "import urllib.request as u, tarfile; u.urlretrieve('https://raw.githubusercontent.com/MohamadMerchant/SNLI/master/data.tar.gz', 'data.tar.gz'); tarfile.open('data.tar.gz').extractall('.')"
+
+
+cd C:\Users\User\Desktop\pytorch-examples-tutorials
+mkdir data; cd data
+curl.exe -LO https://raw.githubusercontent.com/MohamadMerchant/SNLI/master/data.tar.gz
+tar -xvzf data.tar.gz

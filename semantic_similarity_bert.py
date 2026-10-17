@@ -1,20 +1,23 @@
+import tensorflow as tf
 import numpy as np
 import pandas as pd
-import tensorflow as tf
 import transformers
 
 
 from pathlib import Path
 
+import os
+os.environ["TF_USE_LEGACY_KERAS"] = "1"
+
 base_dir = Path(__file__).resolve().parent
 data_dir = base_dir / "data" / "snli_corpus"
 
-train_df = pd.read_csv(data_dir / "snli_1.0_train.csv", nrows=100000)
+train_df = pd.read_csv(data_dir / "snli_1.0_train.csv", nrows=200)
 valid_df = pd.read_csv(data_dir / "snli_1.0_dev.csv")
 test_df = pd.read_csv(data_dir / "snli_1.0_test.csv")
 
 # configuration
-max_length = 128
+max_length = 64
 batch_size = 32
 epochs = 1
 
@@ -183,13 +186,14 @@ valid_data = BertSemanticDataGenerator(train_df[["sentence1", "sentence2"]].valu
 
 
 # train the model
-history = model.fit(train_data, validation_data = valid_data,epochs= epochs, use_multiprocessing=True, workers=-1)
+# history = model.fit(train_data, validation_data = valid_data,epochs= epochs, use_multiprocessing=True, workers=1)
+history = model.fit(train_data, validation_data=valid_data, epochs=epochs)
 
 print(history)
 
 # evaluate model on the test set
 test_data = BertSemanticDataGenerator(
-    test_data[["sentence1", "sentence2"]].values.astype("str"),
+    test_df[["sentence1", "sentence2"]].values.astype("str"),
     y_test,
     batch_size=batch_size,
     shuffle=False
