@@ -3,6 +3,16 @@ import pandas as pd
 import tensorflow as tf
 import transformers
 
+
+from pathlib import Path
+
+base_dir = Path(__file__).resolve().parent
+data_dir = base_dir / "data" / "snli_corpus"
+
+train_df = pd.read_csv(data_dir / "snli_1.0_train.csv", nrows=100000)
+valid_df = pd.read_csv(data_dir / "snli_1.0_dev.csv")
+test_df = pd.read_csv(data_dir / "snli_1.0_test.csv")
+
 # configuration
 max_length = 128
 batch_size = 32
@@ -10,10 +20,10 @@ epochs = 1
 
 
 # there are more than 550k samples in total: we will use 100k for this example
-train_df = pd.read_csv("/users/charles/downloads/SNLI_Corpus/snli_1.0_train.csv", nrows=100000)
-# print(train_df.head())
-valid_df = pd.read_csv("/users/charles/downloads/SNLI_Corpus/snli_1.0_dev.csv")
-test_df = pd.read_csv("/users/charles/downloads/SNLI_Corpus/snli_1.0_test.csv")
+# train_df = pd.read_csv("/users/charles/downloads/SNLI_Corpus/snli_1.0_train.csv", nrows=100000)
+# # print(train_df.head())
+# valid_df = pd.read_csv("/users/charles/downloads/SNLI_Corpus/snli_1.0_dev.csv")
+# test_df = pd.read_csv("/users/charles/downloads/SNLI_Corpus/snli_1.0_test.csv")
 
 
 # shape of the data
