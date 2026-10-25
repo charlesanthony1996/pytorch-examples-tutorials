@@ -40,7 +40,14 @@ class kvcache:
             self.v = mx.concatenate([self.v, pad], axis = 1)
 
 
+def step_uncached():
+    pass
 
+def step_cached(x, cache):
+
+    k_all, v_all = cache.update(x @ wk, x * wv)
+
+    return attend(x @ wq, k_all, v_all)
 
 t0 = time.perf_counter()
 # print(t0)
