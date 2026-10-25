@@ -8,13 +8,13 @@ steps = 1024
 mx.random.seed(0)
 wq, wk, wv = (mx.random.normal((d, d)) * d **-0.5 for _ in range(3))
 
-print(wq)
-print(wk)
-print(wv)
+# print(wq)
+# print(wk)
+# print(wv)
 
-print(wq.shape)
-print(wk.shape)
-print(wv.shape)
+# print(wq.shape)
+# print(wk.shape)
+# print(wv.shape)
 
 tokens = mx.random.normal((1, steps, d))
 
@@ -53,7 +53,7 @@ def step_uncached(history):
 
 def step_cached(x, cache):
 
-    k_all, v_all = cache.update(x @ wk, x * wv)
+    k_all, v_all = cache.update(x @ wk, x @ wv)
 
     return attend(x @ wq, k_all, v_all)
 
@@ -81,4 +81,6 @@ t_cached = time.perf_counter() - t0
 a = mx.concatenate(out_uncached, axis = 1)
 b = mx.concatenate(out_cached, axis = 1)
 
-
+print("max absolute difference: ", mx.abs(a - b).max().item())
+print(f"uncached: {1000 * t_uncached / steps:.3f} ms/step")
+print(f"cached: {1000 * t_cached / steps:.3f} ms/step")
