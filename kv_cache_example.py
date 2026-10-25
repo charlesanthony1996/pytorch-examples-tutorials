@@ -39,9 +39,17 @@ class kvcache:
             self.k = mx.concatenate([self.k, pad], axis = 1)
             self.v = mx.concatenate([self.v, pad], axis = 1)
 
+        self.k[:, self.offset : self.offset + 1, :] = k
+        self.v[:, self.offset: self.offset + 1, :] = v
 
-def step_uncached():
-    pass
+        self.offset += 1
+        return self.k[:, :self.offset], self.v[:, :self.offset]
+
+
+def step_uncached(history):
+
+    q = history[:, -1:] @ wq
+    return attend(q, history @ wk,history @ wv)
 
 def step_cached(x, cache):
 
@@ -51,7 +59,7 @@ def step_cached(x, cache):
 
 t0 = time.perf_counter()
 # print(t0)
-out_uncached = 0
+out_uncached = []
 for t in range(steps):
     y = step_uncached(tokens[:, : t + 1])
     mx.eval(y)
