@@ -9,6 +9,8 @@ import keras
 import keras_hub
 import tensorflow as tf
 
+keras.config.set_dtype_policy("mixed_bfloat16")
+
 # hyperparameters
 epochs = 3
 batch_size = 32
@@ -23,3 +25,23 @@ model_kwargs = dict(
     dropout=0.1
 )
 
+train_ds = keras.utils.text_dataset_from_directory(
+    "datasets/aclImdb/train",
+    batch_size=batch_size,
+    validation_split=0.2,
+    subset="training",
+    seed=42
+)
+
+valid_ds = keras.utils.text_dataset_from_directory(
+    "datasets/aclImdb/train",
+    batch_size=batch_size,
+    validation_split=0.2,
+    subset="validation",
+    seed=42
+)
+
+test_ds = keras.utils.text_dataset_from_directory(
+    "datasets/aclImdb/test",
+    batch_size=batch_size
+)
