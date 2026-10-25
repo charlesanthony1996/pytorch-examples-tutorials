@@ -51,3 +51,26 @@ def step_cached(x, cache):
 
 t0 = time.perf_counter()
 # print(t0)
+out_uncached = 0
+for t in range(steps):
+    y = step_uncached(tokens[:, : t + 1])
+    mx.eval(y)
+    out_uncached.append(y)
+
+t_uncached = time.perf_counter() - t0
+
+t0 = time.perf_counter()
+cache = kvcache()
+out_cached = []
+for t in range(steps):
+
+    y = step_cached(tokens[:, t : t+ 1], cache)
+    mx.eval(y, cache.k, cache.v)
+    out_cached.append(y)
+
+t_cached = time.perf_counter() - t0
+
+a = mx.concatenate(out_uncached, axis = 1)
+b = mx.concatenate(out_cached, axis = 1)
+
+
