@@ -9,6 +9,10 @@ import keras
 import keras_hub
 import tensorflow as tf
 
+# the curl request for the imdb dataset doesnt work anymore
+# script -> prepare_imdb.py
+# run this to download it
+
 keras.config.set_dtype_policy("mixed_bfloat16")
 
 # hyperparameters
@@ -26,7 +30,7 @@ model_kwargs = dict(
 )
 
 train_ds = keras.utils.text_dataset_from_directory(
-    "datasets/aclImdb/train",
+    "/user/charles/desktop/pytorch-examples-tutorials/datasets/aclImdb/train",
     batch_size=batch_size,
     validation_split=0.2,
     subset="training",
@@ -45,3 +49,4 @@ test_ds = keras.utils.text_dataset_from_directory(
     "datasets/aclImdb/test",
     batch_size=batch_size
 )
+
