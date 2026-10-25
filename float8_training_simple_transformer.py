@@ -14,6 +14,12 @@ epochs = 3
 batch_size = 32
 vocabulary_size = 20000
 max_sequence_length = 200
-# model_kwargs = dict(
+model_kwargs = dict(
+    vocabulary_size= vocabulary_size,
+    max_sequence_length=max_sequence_length,
+    hidden_dim = 32,
+    num_heads=2,
+    intermediate_dim=32,
+    dropout=0.1
+)
 
-# ) 

@@ -23,7 +23,7 @@ baseline_acc = accuracy_score(y_test, baseline_pred)
 print("centralized accuracy: ", baseline_acc)
 
 # federated learning simulation
-num_clients = 3
+num_clients = 10
 client_data = np.array_split(x_train, num_clients)
 client_labels = np.array_split(y_train, num_clients)
 
@@ -33,4 +33,21 @@ client_models = []
 for i in range(num_clients):
     model = LogisticRegression(max_iter = 200)
     model.fit(client_data[1], client_labels[i])
-    
+    client_models.append(model)
+
+# aggregrate weights
+coef = np.mean([m.coef_ for m in client_models], axis = 0)
+intercept = np.mean([m.intercept_ for m in client_models], axis = 0)
+
+# create global model
+global_model = LogisticRegression(max_iter = 200)
+global_model.fit(x_train, y_train)
+
+global_model.coef_ = coef
+global_model.intercept_ = intercept
+
+# evaluate fl model
+fl_pred = global_model.predict(x_test)
+fl_acc = accuracy_score(y_test, fl_pred)
+
+print("federated accuracy: ", fl_acc)
