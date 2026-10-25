@@ -30,14 +30,14 @@ model_kwargs = dict(
 )
 
 train_ds = keras.utils.text_dataset_from_directory(
-    "/user/charles/desktop/pytorch-examples-tutorials/datasets/aclImdb/train",
+    "datasets/aclImdb/train",
     batch_size=batch_size,
     validation_split=0.2,
     subset="training",
     seed=42
 )
 
-valid_ds = keras.utils.text_dataset_from_directory(
+val_ds = keras.utils.text_dataset_from_directory(
     "datasets/aclImdb/train",
     batch_size=batch_size,
     validation_split=0.2,
@@ -50,3 +50,7 @@ test_ds = keras.utils.text_dataset_from_directory(
     batch_size=batch_size
 )
 
+# convert the text to lowercase
+train_ds = train_ds.map(lambda x, y: (tf.strings.lower(x, y)))
+val_ds = val_ds.map(lambda x, y: (tf.strings.lower(x, y)))
+test_ds = test_ds.map(lambda x, y: (tf.strings.lower(x, y)))
