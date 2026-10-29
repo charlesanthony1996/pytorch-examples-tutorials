@@ -66,7 +66,7 @@ for text_batch, label_batch in train_ds.take(1):
 def train_word_piece(ds, vocab_size, reserved_tokens):
     word_piece_ds = ds.unbatch().map(lambda x, y: x)
 
-    vocab = keras.hub_tokenizers.compute_word_piece_vocabulary(
+    vocab = keras_hub.tokenizers.compute_word_piece_vocabulary(
         word_piece_ds.batch(1000).prefetch(2),
         vocabulary_size=vocab_size,
         reserved_tokens=reserved_tokens
@@ -74,3 +74,9 @@ def train_word_piece(ds, vocab_size, reserved_tokens):
 
     return vocab
 
+reserved_tokens = ["[PAD]", "[UNK]"]
+train_sentences = [element[0] for element in train_ds]
+vocab = train_word_piece(train_ds, vocabulary_size, reserved_tokens)
+
+# lets print out some tokens now
+print("Tokens: ", vocab[100:110])
