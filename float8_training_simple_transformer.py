@@ -51,6 +51,26 @@ test_ds = keras.utils.text_dataset_from_directory(
 )
 
 # convert the text to lowercase
-train_ds = train_ds.map(lambda x, y: (tf.strings.lower(x, y)))
-val_ds = val_ds.map(lambda x, y: (tf.strings.lower(x, y)))
-test_ds = test_ds.map(lambda x, y: (tf.strings.lower(x, y)))
+train_ds = train_ds.map(lambda x, y: (tf.strings.lower(x), y))
+val_ds = val_ds.map(lambda x, y: (tf.strings.lower(x), y))
+test_ds = test_ds.map(lambda x, y: (tf.strings.lower(x), y))
+
+# print out a few sentences
+for text_batch, label_batch in train_ds.take(1):
+    for i in range(3):
+
+        print(f"text: ", {text_batch.numpy()[i]})
+        print(f"label: ", {label_batch.numpy()[i]})
+
+# tokenizing the data
+def train_word_piece(ds, vocab_size, reserved_tokens):
+    word_piece_ds = ds.unbatch().map(lambda x, y: x)
+
+    vocab = keras.hub_tokenizers.compute_word_piece_vocabulary(
+        word_piece_ds.batch(1000).prefetch(2),
+        vocabulary_size=vocab_size,
+        reserved_tokens=reserved_tokens
+    )
+
+    return vocab
+
